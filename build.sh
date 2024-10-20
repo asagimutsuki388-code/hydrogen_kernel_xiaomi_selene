@@ -260,11 +260,6 @@ zip_kernel() {
         cp ./out/arch/${ARCH}/boot/Image.gz-dtb ./anykernel
     fi
 
-    # Copy dtbo.img if it exists
-    if [ -f "./out/arch/${ARCH}/boot/dtbo.img" ]; then
-        cp ./out/arch/${ARCH}/boot/dtbo.img ./anykernel
-    fi
-
     # Zip the kernel
     cd ./anykernel
     zip -r9 "${zipn}".zip * -x .git README.md *placeholder
