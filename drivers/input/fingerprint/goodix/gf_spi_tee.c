@@ -355,19 +355,29 @@ static void gf_hw_power_enable(struct gf_device *gf_dev, u8 onoff)
 {
 	/* TODO: LDO configure */
 	static int enable = 1;
+<<<<<<< HEAD
 	pr_err("%s\n", __func__);
 	if (onoff && enable) {
 		pr_err("%s %d now reset sensor,pull low\n", __func__, __LINE__);
+=======
+	if (onoff && enable) {
+>>>>>>> 4ccec69
 	/* TODO:  set power  according to actual situation  */
 		enable = 0;
 		#ifdef CONFIG_OF
 		pinctrl_select_state(gf_dev->pinctrl_gpios, gf_dev->pins_reset_low);
 		mdelay(15);
+<<<<<<< HEAD
 		pr_err("%s %d now reset sensor pull high\n", __func__, __LINE__);
 		pinctrl_select_state(gf_dev->pinctrl_gpios, gf_dev->pins_reset_high);
 		#endif
 	} else if (!onoff && !enable) {
 		pr_err("%s %d do nothing\n", __func__, __LINE__);
+=======
+		pinctrl_select_state(gf_dev->pinctrl_gpios, gf_dev->pins_reset_high);
+		#endif
+	} else if (!onoff && !enable) {
+>>>>>>> 4ccec69
 		enable = 1;
 	}
 }
@@ -1193,7 +1203,10 @@ static ssize_t gf_debug_store(struct device *dev,
 			struct device_attribute *attr, const char *buf, size_t count)
 {
 	struct gf_device *gf_dev =  dev_get_drvdata(dev);
+<<<<<<< HEAD
 	int retval = 0;
+=======
+>>>>>>> 4ccec69
 	unsigned char rx_test[10] = {0};
 
 	u8 flag = 0;
@@ -1213,7 +1226,11 @@ static ssize_t gf_debug_store(struct device *dev,
 		gf_debug(INFO_LOG, "%s: parameter is -10, gf init start===============\n", __func__);
 
 		gf_irq_gpio_cfg(gf_dev);
+<<<<<<< HEAD
 		retval = request_threaded_irq(gf_dev->irq, NULL, gf_irq,
+=======
+		request_threaded_irq(gf_dev->irq, NULL, gf_irq,
+>>>>>>> 4ccec69
 				IRQF_TRIGGER_RISING | IRQF_ONESHOT, dev_name(&(gf_dev->spi->dev)), gf_dev);
 		gf_dev->irq_count = 1;
 		gf_disable_irq(gf_dev);
@@ -2024,12 +2041,18 @@ static int gf_probe(struct spi_device *spi)
 	//pinctrl_select_state(gf_dev->pinctrl_gpios, gf_dev->pins_miso_spi);
 
 	/*enable the power*/
+<<<<<<< HEAD
 	pr_err("%s %d now get dts info done!", __func__, __LINE__);
 	gf_hw_power_enable(gf_dev, 1);
 	gf_bypass_flash_gpio_cfg();
 	pr_err("%s %d now enable spi clk API", __func__, __LINE__);
 	gf_spi_clk_enable(gf_dev, 1);
 	pr_err("%s %d now enable spi clk Done", __func__, __LINE__);
+=======
+	gf_hw_power_enable(gf_dev, 1);
+	gf_bypass_flash_gpio_cfg();
+	gf_spi_clk_enable(gf_dev, 1);
+>>>>>>> 4ccec69
 	/* check firmware Integrity */
 	//gf_debug(INFO_LOG, "%s, Sensor type : %s.\n", __func__, CONFIG_GOODIX_SENSOR_TYPE);
 
@@ -2049,7 +2072,10 @@ static int gf_probe(struct spi_device *spi)
 
 	mdelay(1);
 	gf_spi_read_bytes(gf_dev, 0x0000, 4, rx_test);
+<<<<<<< HEAD
 	pr_err("%s rx_test chip id:0x%x 0x%x 0x%x 0x%x \n", __func__, rx_test[0], rx_test[1], rx_test[2], rx_test[3]);
+=======
+>>>>>>> 4ccec69
 	if (1) {
 		if (((rx_test[0] != 0x07) || (rx_test[3] != 0x25)) && ((rx_test[0] != 0x08) || (rx_test[3] != 0x25)) && ((rx_test[0] != 0x10) || (rx_test[3] != 0x25))) {
 			goodix_fp_exist = false;
@@ -2204,7 +2230,10 @@ static int gf_probe(struct spi_device *spi)
 	gf_dev->probe_finish = 1;
 	gf_dev->is_sleep_mode = 0;
 	gf_debug(INFO_LOG, "%s probe finished\n", __func__);
+<<<<<<< HEAD
 	pr_err("%s %d now disable spi clk API", __func__, __LINE__);
+=======
+>>>>>>> 4ccec69
 	gf_spi_clk_enable(gf_dev, 0);
 
 #ifdef CONFIG_HQ_SYSFS_SUPPORT
@@ -2343,7 +2372,10 @@ static int __init gf_init(void)
 	int status = 0;
 	g_debug_level = DEBUG_LOG;
 	FUNC_ENTRY();
+<<<<<<< HEAD
 	pr_err("%s %d\n", __func__, __LINE__);
+=======
+>>>>>>> 4ccec69
 	/*
 	if (fpc1022_fp_exist) {
 		pr_err("%s FPC sensor has been detected, so exit Goodxi sensor detect.\n",__func__);

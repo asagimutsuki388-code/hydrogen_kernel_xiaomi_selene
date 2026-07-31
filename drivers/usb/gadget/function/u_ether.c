@@ -1196,12 +1196,26 @@ struct eth_dev *gether_setup_name(struct usb_gadget *g,
 	} else {
 		net->addr_assign_type = NET_ADDR_SET;
 	}
+<<<<<<< HEAD
 	if (get_ether_addr(host_addr, dev->host_mac))
 		dev_info(&g->dev, "using random %s ethernet address\n", "host");
 #else
 	if (get_ether_addr(dev_addr, net->dev_addr))
 		dev_warn(&g->dev,
 			"using random %s ethernet address\n", "self");
+=======
+
+	if (get_ether_addr(host_addr, dev->host_mac))
+		dev_info(&g->dev, "using random %s ethernet address\n", "host");
+#else
+	if (get_ether_addr(dev_addr, net->dev_addr)) {
+		net->addr_assign_type = NET_ADDR_RANDOM;
+		dev_warn(&g->dev,
+			"using random %s ethernet address\n", "self");
+	} else {
+		net->addr_assign_type = NET_ADDR_SET;
+	}
+>>>>>>> 4ccec69
 
 	ether_addr_copy(dev->host_mac, a);
 	pr_debug("%s, tjrndis1: %x:%x:%x:%x:%x:%x\n", __func__,

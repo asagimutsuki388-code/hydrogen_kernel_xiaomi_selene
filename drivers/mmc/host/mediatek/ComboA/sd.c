@@ -471,9 +471,12 @@ int msdc_clk_stable(struct msdc_host *host, u32 mode, u32 div,
 		if (retry == 0) {
 			pr_debug("msdc%d on clock failed ===> retry twice\n",
 				host->id);
-
-			msdc_clk_disable(host);
-			msdc_clk_enable(host);
+			if (lock)
+				spin_unlock(&host->lock);
+			msdc_clk_disable_unprepare(host);
+			msdc_clk_prepare_enable(host);
+			if (lock)
+				spin_lock(&host->lock);
 			msdc_dump_info(NULL, 0, NULL, host->id);
 			host->prev_cmd_cause_dump = 0;
 		}
@@ -1558,6 +1561,7 @@ static unsigned int msdc_command_start(struct msdc_host   *host,
 		break;
 #endif
 	case MMC_GEN_CMD:
+	case MMC_VENDOR_CMD63:
 		if (cmd->data && cmd->data->flags & MMC_DATA_WRITE)
 			rawcmd |= (1 << 13);
 		if (cmd->data && cmd->data->blocks > 1)
@@ -2229,10 +2233,10 @@ int msdc_pio_read(struct msdc_host *host, struct mmc_data *data)
 
 		for (i = 0; i < totalpages; i++) {
 			kaddr[i] = (ulong) kmap(hmpage + i);
-			if ((i > 0) && ((kaddr[i] - kaddr[i - 1]) != PAGE_SIZE))
-				flag = 1;
 			if (!kaddr[i])
 				ERR_MSG("msdc0:kmap failed %lx", kaddr[i]);
+			if ((i > 0) && ((kaddr[i] - kaddr[i - 1]) != PAGE_SIZE))
+				flag = 1;
 		}
 
 		ptr = sg_virt(sg);
@@ -2430,10 +2434,10 @@ int msdc_pio_write(struct msdc_host *host, struct mmc_data *data)
 		/* Kmap all need pages, */
 		for (i = 0; i < totalpages; i++) {
 			kaddr[i] = (ulong) kmap(hmpage + i);
-			if ((i > 0) && ((kaddr[i] - kaddr[i - 1]) != PAGE_SIZE))
-				flag = 1;
 			if (!kaddr[i])
 				ERR_MSG("msdc0:kmap failed %lx\n", kaddr[i]);
+			if ((i > 0) && ((kaddr[i] - kaddr[i - 1]) != PAGE_SIZE))
+				flag = 1;
 		}
 
 		ptr = sg_virt(sg);
@@ -3146,6 +3150,7 @@ int msdc_do_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	unsigned int left = 0;
 	int ret = 0;
 	unsigned long pio_tmo;
+	int lock = spin_is_locked(&host->lock);
 
 	#ifndef SDIO_EARLY_SETTING_RESTORE
 	if (is_card_sdio(host) || (host->hw->flags & MSDC_SDIO_IRQ))
@@ -3260,8 +3265,12 @@ int msdc_do_request(struct mmc_host *mmc, struct mmc_request *mrq)
 			pr_debug("[%s]: start pio read\n", __func__);
 #endif
 			if (msdc_pio_read(host, data)) {
-				msdc_clk_disable(host);
+				if (lock)
+					spin_unlock(&host->lock);
+				msdc_clk_disable_unprepare(host);
 				msdc_clk_enable_and_stable(host);
+				if (lock)
+					spin_lock(&host->lock);
 				goto stop;      /* need cmd12 */
 			}
 		} else {
@@ -3269,8 +3278,12 @@ int msdc_do_request(struct mmc_host *mmc, struct mmc_request *mrq)
 			pr_debug("[%s]: start pio write\n", __func__);
 #endif
 			if (msdc_pio_write(host, data)) {
-				msdc_clk_disable(host);
+				if (lock)
+					spin_unlock(&host->lock);
+				msdc_clk_disable_unprepare(host);
 				msdc_clk_enable_and_stable(host);
+				if (lock)
+					spin_lock(&host->lock);
 				goto stop;
 			}
 
@@ -3792,7 +3805,7 @@ static void msdc_dump_trans_error(struct msdc_host   *host,
 
 	if (is_card_sdio(host) &&
 	    (host->sdio_error != -EILSEQ) &&
-	    (cmd->opcode == 53) &&
+	    (cmd->opcode == 53) && data &&
 	    (sg_dma_len(data->sg) > 4)) {
 		host->sdio_error = -EILSEQ;
 		ERR_MSG("XXX SDIO Error ByPass");
@@ -4394,7 +4407,6 @@ void msdc_ops_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 			mmc_retune_disable(host->mmc);
 		}
 	}
-
 	spin_unlock(&host->lock);
 }
 
@@ -5129,6 +5141,8 @@ static void msdc_cqhci_pre_cqe_enable(struct mmc_host *mmc, bool en)
 	void __iomem *base = host->base;
 
 	if (en) {
+		/* switch to DMA mode before cmdq_enable */
+		MSDC_CLR_BIT32(MSDC_CFG, MSDC_CFG_PIO);
 		/* enable busy check */
 		MSDC_SET_BIT32(MSDC_PATCH_BIT1, MSDC_PB1_BUSY_CHECK_SEL);
 		/* default write data / busy timeout 20 * 1000ms */

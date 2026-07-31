@@ -297,7 +297,11 @@ static int mcupm_init_v1(struct pll_dts *array, struct match *match)
 	match_data = match->hdlr->data;
 	if (match_data && match_data->reg_tr) {
 		priv_data->reg_tr = array->fhctl_base
+<<<<<<< HEAD
 			+ (unsigned int)match_data->reg_tr;
+=======
+			+ (uintptr_t)match_data->reg_tr;
+>>>>>>> 4ccec69
 	}
 
 	/* hook to array */

@@ -79,7 +79,11 @@ void gps_dl_bus_check_and_print(unsigned int host_addr);
 #define GPS_DL_HOST_REG_WR(host_addr, val)  ((*(conn_reg *)host_addr) = (val))
 #define GPS_DL_HOST_REG_RD(host_addr)       (*(conn_reg *)host_addr)
 #else
+<<<<<<< HEAD
 #define GPS_DL_HOST_REG_WR(host_addr, val)  do {} while (0)
+=======
+#define GPS_DL_HOST_REG_WR(host_addr, val)  ((void)0)
+>>>>>>> 4ccec69
 #define GPS_DL_HOST_REG_RD(host_addr)       (0)
 #endif
 

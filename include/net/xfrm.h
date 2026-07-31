@@ -132,6 +132,7 @@ struct xfrm_state_offload {
 	u8			flags;
 };
 
+<<<<<<< HEAD
 #define XFRM_TRACK_ADDRS_COUNT 16
 
 struct xfrm_state_trace {
@@ -143,6 +144,8 @@ struct xfrm_state_trace {
 	unsigned long addrs[XFRM_TRACK_ADDRS_COUNT];
 };
 
+=======
+>>>>>>> 4ccec69
 /* Full description of state of transformer. */
 struct xfrm_state {
 	possible_net_t		xs_net;
@@ -156,12 +159,15 @@ struct xfrm_state {
 	refcount_t		refcnt;
 	spinlock_t		lock;
 
+<<<<<<< HEAD
 	struct xfrm_state_trace xfrm_alloc_trace;
 	struct xfrm_state_trace xfrm_free_trace;
 	struct xfrm_state_trace xfrm_transfer_trace;
 	struct xfrm_state_trace xfrm_find_trace;
 	struct xfrm_state_trace xfrm_insert_trace;
 
+=======
+>>>>>>> 4ccec69
 	struct xfrm_id		id;
 	struct xfrm_selector	sel;
 	struct xfrm_mark	mark;
@@ -1063,6 +1069,7 @@ struct xfrm_offload {
 #define	XFRM_GSO_SEGMENT	16
 #define	XFRM_GRO		32
 #define	XFRM_ESP_NO_TRAILER	64
+#define	XFRM_DEV_RESUME		128
 
 	__u32			status;
 #define CRYPTO_SUCCESS				1
@@ -1085,15 +1092,6 @@ struct sec_path {
 	struct xfrm_state	*xvec[XFRM_MAX_DEPTH];
 	struct xfrm_offload	ovec[XFRM_MAX_OFFLOAD_DEPTH];
 };
-
-static inline int secpath_exists(struct sk_buff *skb)
-{
-#ifdef CONFIG_XFRM
-	return skb->sp != NULL;
-#else
-	return 0;
-#endif
-}
 
 static inline struct sec_path *
 secpath_get(struct sec_path *sp)
@@ -1907,21 +1905,27 @@ static inline struct xfrm_state *xfrm_input_state(struct sk_buff *skb)
 {
 	return skb->sp->xvec[skb->sp->len - 1];
 }
+#endif
 static inline struct xfrm_offload *xfrm_offload(struct sk_buff *skb)
 {
+#ifdef CONFIG_XFRM
 	struct sec_path *sp = skb->sp;
 
 	if (!sp || !sp->olen || sp->len != sp->olen)
 		return NULL;
 
 	return &sp->ovec[sp->olen - 1];
-}
+#else
+	return NULL;
 #endif
+}
 
 void __net_init xfrm_dev_init(void);
 
 #ifdef CONFIG_XFRM_OFFLOAD
-int validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t features);
+void xfrm_dev_resume(struct sk_buff *skb);
+void xfrm_dev_backlog(struct softnet_data *sd);
+struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t features, bool *again);
 int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
 		       struct xfrm_user_offload *xuo);
 bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x);
@@ -1960,9 +1964,17 @@ static inline void xfrm_dev_state_free(struct xfrm_state *x)
 	}
 }
 #else
-static inline int validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t features)
+static inline void xfrm_dev_resume(struct sk_buff *skb)
 {
-	return 0;
+}
+
+static inline void xfrm_dev_backlog(struct softnet_data *sd)
+{
+}
+
+static inline struct sk_buff *validate_xmit_xfrm(struct sk_buff *skb, netdev_features_t features, bool *again)
+{
+	return skb;
 }
 
 static inline int xfrm_dev_state_add(struct net *net, struct xfrm_state *x, struct xfrm_user_offload *xuo)

@@ -31,6 +31,7 @@
 #define xfrm_state_deref_prot(table, net) \
 	rcu_dereference_protected((table), lockdep_is_held(&(net)->xfrm.xfrm_state_lock))
 
+<<<<<<< HEAD
 #undef MTK_XFM_DEBUG
 #ifdef CONFIG_MTK_ENG_BUILD
 #define MTK_XFM_DEBUG
@@ -52,6 +53,8 @@ static void xfrm_state_check_del_byspi_hlish(struct xfrm_state *x, char *func_na
 static void xfrm_state_get_back_trace(struct xfrm_state_trace *trace);
 static void xfrm_state_print_back_trace(struct xfrm_state *x);
 
+=======
+>>>>>>> 4ccec69
 static void xfrm_state_gc_task(struct work_struct *work);
 
 /* Each xfrm_state may be linked to two tables:
@@ -122,6 +125,7 @@ static void xfrm_hash_transfer(struct hlist_head *list,
 			h = __xfrm_spi_hash(&x->id.daddr, x->id.spi,
 					    x->id.proto, x->props.family,
 					    nhashmask);
+<<<<<<< HEAD
 #ifdef MTK_XFM_DEBUG
 			pr_info("[mtk_net][xfrm_state] add list %s x %px byspi %px  h %d\n",
 				__func__, x, nspitable, h);
@@ -129,9 +133,9 @@ static void xfrm_hash_transfer(struct hlist_head *list,
 			xfrm_state_get_back_trace(&x->xfrm_transfer_trace);
 			format_trace_info();
 			xfrm_state_check_add_byspi_hlish(nspitable + h, x, dmsg);
+=======
+>>>>>>> 4ccec69
 			hlist_add_head_rcu(&x->byspi, nspitable + h);
-			format_trace_info();
-			xfrm_state_check_add_byspi_hlish(nspitable + h, NULL, dmsg);
 		}
 	}
 }
@@ -457,10 +461,13 @@ static void xfrm_put_mode(struct xfrm_mode *mode)
 
 static void xfrm_state_gc_destroy(struct xfrm_state *x)
 {
+<<<<<<< HEAD
 #ifdef MTK_XFM_DEBUG
 	pr_info("[mtk_net][xfrm_state] %s  free x %px\n", __func__, x);
 #endif
 	xfrm_state_get_back_trace(&x->xfrm_free_trace);
+=======
+>>>>>>> 4ccec69
 	tasklet_hrtimer_cancel(&x->mtimer);
 	del_timer_sync(&x->rtimer);
 	kfree(x->aead);
@@ -600,9 +607,7 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
 	struct xfrm_state *x;
 
 	x = kzalloc(sizeof(struct xfrm_state), GFP_ATOMIC);
-#ifdef MTK_XFM_DEBUG
-	pr_info("[mtk_net][xfrm_state] %s alloc x: %px\n", __func__, x);
-#endif
+
 	if (x) {
 		write_pnet(&x->xs_net, net);
 		refcount_set(&x->refcnt, 1);
@@ -625,11 +630,14 @@ struct xfrm_state *xfrm_state_alloc(struct net *net)
 		x->inner_mode = NULL;
 		x->inner_mode_iaf = NULL;
 		spin_lock_init(&x->lock);
+<<<<<<< HEAD
 		x->xfrm_alloc_trace.count = 0;
 		x->xfrm_free_trace.count = 0;
 		x->xfrm_transfer_trace.count = 0;
 		x->xfrm_find_trace.count = 0;
 		x->xfrm_insert_trace.count = 0;
+=======
+>>>>>>> 4ccec69
 	}
 	return x;
 }
@@ -657,14 +665,8 @@ int __xfrm_state_delete(struct xfrm_state *x)
 		list_del(&x->km.all);
 		hlist_del_rcu(&x->bydst);
 		hlist_del_rcu(&x->bysrc);
-		if (x->id.spi) {
-			xfrm_state_check_del_byspi_hlish(x, NULL);
+		if (x->id.spi)
 			hlist_del_rcu(&x->byspi);
-#ifdef MTK_XFM_DEBUG
-			pr_info("[mtk_net][xfrm_state] %s delete x %px from byspi list\n",
-				__func__, x);
-#endif
-		}
 		net->xfrm.state_num--;
 		spin_unlock(&net->xfrm.xfrm_state_lock);
 
@@ -864,6 +866,7 @@ xfrm_init_tempstate(struct xfrm_state *x, const struct flowi *fl,
 	afinfo->init_temprop(x, tmpl, daddr, saddr);
 }
 
+<<<<<<< HEAD
 static void xfrm_state_get_back_trace(struct xfrm_state_trace *trace)
 {
 #ifdef CONFIG_MTK_ENG_BUILD
@@ -1070,6 +1073,8 @@ static struct xfrm_state *__xfrm_state_lookup(struct net *net, u32 mark,
 
 #else
 
+=======
+>>>>>>> 4ccec69
 static struct xfrm_state *__xfrm_state_lookup(struct net *net, u32 mark,
 					      const xfrm_address_t *daddr,
 					      __be32 spi, u8 proto,
@@ -1094,8 +1099,6 @@ static struct xfrm_state *__xfrm_state_lookup(struct net *net, u32 mark,
 
 	return NULL;
 }
-
-#endif //#ifdef CONFIG_MTK_ENG_BUILD
 
 static struct xfrm_state *__xfrm_state_lookup_byaddr(struct net *net, u32 mark,
 						     const xfrm_address_t *daddr,
@@ -1290,16 +1293,13 @@ found:
 			hlist_add_head_rcu(&x->bysrc, net->xfrm.state_bysrc + h);
 			if (x->id.spi) {
 				h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, encap_family);
+<<<<<<< HEAD
 				xfrm_state_get_back_trace(&x->xfrm_find_trace);
 				format_trace_info();
 				xfrm_state_check_add_byspi_hlish(net->xfrm.state_byspi + h, x, dmsg);
+=======
+>>>>>>> 4ccec69
 				hlist_add_head_rcu(&x->byspi, net->xfrm.state_byspi + h);
-#ifdef MTK_XFM_DEBUG
-				pr_info("[mtk_net][xfrm_state] add list %s x %px byspi %px  h %d\n",
-					__func__, x, net->xfrm.state_byspi, h);
-#endif
-				format_trace_info();
-				xfrm_state_check_add_byspi_hlish(net->xfrm.state_byspi + h, NULL, dmsg);
 			}
 			x->lft.hard_add_expires_seconds = net->xfrm.sysctl_acq_expires;
 			tasklet_hrtimer_start(&x->mtimer, ktime_set(net->xfrm.sysctl_acq_expires, 0), HRTIMER_MODE_REL);
@@ -1410,16 +1410,14 @@ static void __xfrm_state_insert(struct xfrm_state *x)
 	if (x->id.spi) {
 		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto,
 				  x->props.family);
+<<<<<<< HEAD
 		xfrm_state_get_back_trace(&x->xfrm_insert_trace);
 		format_trace_info();
 		xfrm_state_check_add_byspi_hlish(net->xfrm.state_byspi + h, x, dmsg);
+=======
+
+>>>>>>> 4ccec69
 		hlist_add_head_rcu(&x->byspi, net->xfrm.state_byspi + h);
-#ifdef MTK_XFM_DEBUG
-		pr_info("[mtk_net][xfrm_state] add list  %s x %px byspi %px  h %d\n",
-			__func__, x, net->xfrm.state_byspi, h);
-#endif
-		format_trace_info();
-		xfrm_state_check_add_byspi_hlish(net->xfrm.state_byspi + h, NULL, dmsg);
 	}
 
 	tasklet_hrtimer_start(&x->mtimer, ktime_set(1, 0), HRTIMER_MODE_REL);
@@ -1922,9 +1920,9 @@ xfrm_state_lookup(struct net *net, u32 mark, const xfrm_address_t *daddr, __be32
 {
 	struct xfrm_state *x;
 
-	rcu_read_lock();
+	spin_lock_bh(&net->xfrm.xfrm_state_lock);
 	x = __xfrm_state_lookup(net, mark, daddr, spi, proto, family);
-	rcu_read_unlock();
+	spin_unlock_bh(&net->xfrm.xfrm_state_lock);
 	return x;
 }
 EXPORT_SYMBOL(xfrm_state_lookup);
@@ -2119,16 +2117,13 @@ int xfrm_alloc_spi(struct xfrm_state *x, u32 low, u32 high)
 		spin_lock_bh(&net->xfrm.xfrm_state_lock);
 		x->id.spi = newspi;
 		h = xfrm_spi_hash(net, &x->id.daddr, x->id.spi, x->id.proto, x->props.family);
+<<<<<<< HEAD
 		xfrm_state_get_back_trace(&x->xfrm_alloc_trace);
 		format_trace_info();
 		xfrm_state_check_add_byspi_hlish(net->xfrm.state_byspi + h, x, dmsg);
+=======
+>>>>>>> 4ccec69
 		hlist_add_head_rcu(&x->byspi, net->xfrm.state_byspi + h);
-#ifdef MTK_XFM_DEBUG
-		pr_info("[mtk_net][xfrm_state]add list  %s x %px byspi %px  h %d\n",
-			__func__, x, net->xfrm.state_byspi, h);
-#endif
-		format_trace_info();
-		xfrm_state_check_add_byspi_hlish(net->xfrm.state_byspi + h, NULL, dmsg);
 		spin_unlock_bh(&net->xfrm.xfrm_state_lock);
 
 		err = 0;

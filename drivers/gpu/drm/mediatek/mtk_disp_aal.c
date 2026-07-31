@@ -267,20 +267,32 @@ static int disp_aal_get_cust_led(void)
 	"mediatek,lcd-backlight");
 	if (!led_node) {
 		ret = -1;
+<<<<<<< HEAD
 		pr_debug("Cannot find LED node from dts\n");
+=======
+		pr_err("Cannot find LED node from dts\n");
+>>>>>>> 4ccec69
 	} else {
 		ret = of_property_read_u32(led_node, "led_mode", &led_mode);
 		if (!ret)
 			atomic_set(&g_led_mode, led_mode);
 		else
+<<<<<<< HEAD
 			pr_debug("led dts can not get led mode data.\n");
+=======
+			pr_err("led dts can not get led mode data.\n");
+>>>>>>> 4ccec69
 
 		ret = of_property_read_u32_array(led_node,
 	    "pwm_config", pwm_config, ARRAY_SIZE(pwm_config));
 	}
 
 	if (ret)
+<<<<<<< HEAD
 		pr_debug("get pwm cust info fail\n");
+=======
+		pr_err("get pwm cust info fail\n");
+>>>>>>> 4ccec69
 	pr_debug("%s mode=%u\n", __func__, atomic_read(&g_led_mode));
 
 	return ret;
@@ -803,7 +815,7 @@ void dump_hist(struct DISP_AAL_HIST *data)
 			data->dre_enable);
 }
 
-static bool debug_dump_aal_hist;
+static bool debug_dump_aal_hist = 0;
 int mtk_drm_ioctl_aal_get_hist(struct drm_device *dev, void *data,
 	struct drm_file *file_priv)
 {
@@ -1188,7 +1200,7 @@ void dump_param(const struct DISP_AAL_PARAM *param)
 		param->allowPartial, param->refreshLatency);
 }
 
-static bool debug_dump_input_param;
+static bool debug_dump_input_param = 0;
 int disp_aal_set_param(struct mtk_ddp_comp *comp, struct cmdq_pkt *handle,
 		struct DISP_AAL_PARAM *param)
 {
@@ -1384,7 +1396,7 @@ static void disp_aal_clear_irq(struct mtk_ddp_comp *comp,
 }
 
 static bool debug_skip_dre3_irq;
-static bool debug_dump_reg_irq;
+static bool debug_dump_reg_irq = 0;
 static int dump_blk_x = -1;
 static int dump_blk_y = -1;
 #if defined(CONFIG_MTK_DRE30_SUPPORT)
@@ -1495,7 +1507,11 @@ static bool disp_aal_read_dre3(struct mtk_ddp_comp *comp,
 		g_aal_dre30_hist.dre_hist[arry_offset++] = read_value;
 	}
 	if (dump_start >= 0)
+<<<<<<< HEAD
 		pr_debug("[DRE3][HIST][%d-%d] %08x %08x %08x %08x %08x %08x\n",
+=======
+		pr_err("[DRE3][HIST][%d-%d] %08x %08x %08x %08x %08x %08x\n",
+>>>>>>> 4ccec69
 			dump_blk_x, dump_blk_y,
 			dump_table[0], dump_table[1], dump_table[2],
 			dump_table[3], dump_table[4], dump_table[5]);

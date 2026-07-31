@@ -363,6 +363,7 @@ static ssize_t mtkfb_set_refresh(struct device *dev, struct device_attribute *at
 		return len;
 }
 /* Huaqin modify for HQ-141505 by caogaojie at 2021/06/18 end */
+<<<<<<< HEAD
 static int mtkfb_set_rgb_point_init(void)
 {
 	if (strncmp(mtkfb_lcm_name, "nt36672A_fhdp_dsi_vdo_tianma_lcm_drv", 36) == 0) {
@@ -389,6 +390,8 @@ static int mtkfb_set_rgb_point_init(void)
 		return -1;
 	}
 }
+=======
+>>>>>>> 4ccec69
 
 static ssize_t mtkfb_get_hbm(struct device *dev, struct device_attribute *attr, char *buf)
 {
@@ -490,6 +493,7 @@ static ssize_t mtkfb_get_panel_info(struct device *dev, struct device_attribute 
 	int ret = 0;
 	/* Huaqin modify for HQ-140354 by liunianliang at 2021/06/15 end */
 
+<<<<<<< HEAD
 	if (strncmp(mtkfb_lcm_name, "nt36672A_fhdp_dsi_vdo_tianma_lcm_drv", 36) == 0) {
 		ret = sprintf(buf, "incell,vendor:tianma,IC:nt36672a(novatek)\n");
 	} else if (strncmp(mtkfb_lcm_name, "ft8719_fhdp_dsi_vdo_xinli_lcm_drv", 33) == 0) {
@@ -506,6 +510,8 @@ static ssize_t mtkfb_get_panel_info(struct device *dev, struct device_attribute 
 		ret = sprintf(buf, "incell,vendor:tianma,IC:nt36672D(novatek)\n");
 	}
 
+=======
+>>>>>>> 4ccec69
 	return ret;
 }
 
@@ -1371,7 +1377,7 @@ int mtkfb_aod_mode_switch(enum mtkfb_aod_power_mode aod_pm)
 	enum mtkfb_power_mode prev_pm = primary_display_get_power_mode();
 
 	DISPCHECK("AOD: ioctl: %s\n",
-		aod_pm ? "AOD_DOZE_SUSPEND" : "AOD_DOZE");
+		(aod_pm != 0) ? "AOD_DOZE_SUSPEND" : "AOD_DOZE");
 	if (!primary_is_aod_supported()) {
 		DISPCHECK("AOD: feature not support\n");
 		return ret;
@@ -1404,7 +1410,8 @@ int mtkfb_aod_mode_switch(enum mtkfb_aod_power_mode aod_pm)
 	}
 	if (ret < 0)
 		DISPERR("AOD: set %s failed\n",
-			aod_pm ? "AOD_SUSPEND" : "AOD_RESUME");
+			(aod_pm != MTKFB_AOD_DOZE) ? "AOD_SUSPEND"
+			: "AOD_RESUME");
 	return ret;
 }
 
@@ -3005,11 +3012,19 @@ static int mtkfb_probe(struct platform_device *pdev)
 	"prim_panel_wakelock");*/
 	/* end modify for unlock speed */
 
+<<<<<<< HEAD
 	if (!strcmp(mtkfb_find_lcm_driver(),
 		"nt35521_hd_dsi_vdo_truly_rt5081_drv")) {
 		register_ccci_sys_call_back(MD_SYS1,
 			MD_DISPLAY_DYNAMIC_MIPI, mipi_clk_change);
 	}
+=======
+#ifdef CONFIG_LM3697_SUPPORT
+	r = sysfs_create_group(&fbi->dev->kobj, &mtk_fb_attr_group);
+	if (r)
+		pr_err("sysfs group creat failed, rc = %d\n", r);
+#endif
+>>>>>>> 4ccec69
 
 #ifdef CONFIG_LM3697_SUPPORT
 	r = mtkfb_set_rgb_point_init();

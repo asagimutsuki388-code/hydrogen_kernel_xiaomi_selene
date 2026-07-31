@@ -36,11 +36,7 @@ subdir-ccflags-y += -I$(srctree)/drivers/staging/android/ion \
 subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3/ \
 		    -I$(srctree)/drivers/misc/mediatek/cmdq/bridge
 
-ifeq ($(CONFIG_MACH_MT6761),y)
-    subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3/mt6765/
-else
-    subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3/$(MTK_PLATFORM)/
-endif
+subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/cmdq/v3/$(MTK_PLATFORM)/
 
 subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/mmp/
 
@@ -98,10 +94,6 @@ obj-y += display_recorder.o
 
 ifeq ($(CONFIG_MMPROFILE),y)
 ccflags-y += -DDEFAULT_MMP_ENABLE
-endif
-
-ifeq ($(MTK_MIRAVISION_SUPPORT), yes)
-    ccflags-y += -DCONFIG_FOR_SOURCE_PQ
 endif
 
 ccflags-y += -DMET_USER_EVENT_SUPPORT

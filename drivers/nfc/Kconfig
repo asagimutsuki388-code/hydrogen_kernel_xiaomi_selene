@@ -14,6 +14,7 @@ config NFC_PN553_DEVICES
 
 	  You can say N here if you don't have any SPI connected to your computer.
 
+<<<<<<< HEAD
 config NFC_PN553_19A_DEVICES
 	bool "Nxp pn553 NCI protocol driver (I2C) for K19A devices"
 	default n
@@ -23,6 +24,8 @@ config NFC_PN553_19A_DEVICES
 
 	  You can say N here if you don't have any SPI connected to your computer.
 
+=======
+>>>>>>> 4ccec69
 config NFC_TRF7970A
 	tristate "Texas Instruments TRF7970a NFC driver"
 	depends on SPI && NFC_DIGITAL && GPIOLIB

@@ -40,6 +40,7 @@ struct swtp_t {
 	unsigned int	eint_type[MAX_PIN_NUM];
 	unsigned int	gpio_state[MAX_PIN_NUM];
 	int	tx_power_mode;
+<<<<<<< HEAD
 	spinlock_t		spinlock;
 	struct delayed_work delayed_work;
 	struct delayed_work init_delayed_work;
@@ -54,10 +55,29 @@ struct swtp_t {
 	unsigned int	eint_type;
 	unsigned int	curr_mode;
 	unsigned int	retry_cnt;
+=======
+>>>>>>> 4ccec69
 	spinlock_t		spinlock;
 	struct delayed_work delayed_work;
     struct delayed_work delayed_work_swtp;
 };
+<<<<<<< HEAD
+=======
+
+/*
+struct swtp_t {
+	unsigned int	md_id;
+	unsigned int	irq;
+	unsigned int	gpiopin;
+	unsigned int	setdebounce;
+	unsigned int	eint_type;
+	unsigned int	curr_mode;
+	unsigned int	retry_cnt;
+	spinlock_t		spinlock;
+	struct delayed_work delayed_work;
+    struct delayed_work delayed_work_swtp;
+};
+>>>>>>> 4ccec69
 */
 /*****************************************************************************/
 /* External API Region called by ccci_swtp object */

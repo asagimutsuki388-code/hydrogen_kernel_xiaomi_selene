@@ -50,6 +50,10 @@
 #define ARM64_SPECTRE_BHB			30
 #define ARM64_WORKAROUND_1742098		31
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4ccec69
 #define ARM64_NCAPS				32
 
 #endif /* __ASM_CPUCAPS_H */

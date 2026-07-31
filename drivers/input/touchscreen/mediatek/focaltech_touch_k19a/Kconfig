@@ -8,8 +8,11 @@ config TOUCHSCREEN_FTS_XIAOMI
 	help
 	  Say Y here if you have Focaltech touch panel.
 	  If unsure, say N.
+<<<<<<< HEAD
 
 config TOUCHSCREEN_FTS_DIRECTORY
 	string "Focaltech ts directory name"
 	default "focaltech_touch"
 	depends on TOUCHSCREEN_FTS_XIAOMI
+=======
+>>>>>>> 4ccec69

@@ -48,7 +48,6 @@ struct rcu_node;
 struct reclaim_state;
 struct robust_list_head;
 struct sched_attr;
-struct sched_param;
 struct seq_file;
 struct sighand_struct;
 struct signal_struct;
@@ -222,10 +221,6 @@ extern void scheduler_tick(void);
 
 #define	MAX_SCHEDULE_TIMEOUT		LONG_MAX
 
-#ifdef CONFIG_DEBUG_PREEMPT
-#define PREEMPT_DISABLE_DEEPTH 5
-#endif
-
 extern long schedule_timeout(long timeout);
 extern long schedule_timeout_interruptible(long timeout);
 extern long schedule_timeout_killable(long timeout);
@@ -293,6 +288,10 @@ struct vtime {
 	u64			utime;
 	u64			stime;
 	u64			gtime;
+};
+
+struct sched_param {
+	int sched_priority;
 };
 
 enum uclamp_id {
@@ -994,15 +993,6 @@ struct task_struct {
 	unsigned long			min_flt;
 	unsigned long			maj_flt;
 
-#ifdef CONFIG_MTK_MLOG
-	/* Page-in/out accounting for filemap fault and swap */
-	unsigned long			fm_flt;
-#ifdef CONFIG_SWAP
-	unsigned long			swap_in;
-	unsigned long			swap_out;
-#endif
-#endif
-
 #ifdef CONFIG_POSIX_TIMERS
 	struct task_cputime		cputime_expires;
 	struct list_head		cpu_timers[3];
@@ -1202,7 +1192,6 @@ struct task_struct {
 #endif
 #ifdef CONFIG_DEBUG_PREEMPT
 	unsigned long			preempt_disable_ip;
-	unsigned long preempt_disable_ips[PREEMPT_DISABLE_DEEPTH];
 #endif
 #ifdef CONFIG_NUMA
 	/* Protected by alloc_lock: */
@@ -1748,7 +1737,11 @@ extern int task_curr(const struct task_struct *p);
 extern int idle_cpu(int cpu);
 extern int sched_setscheduler(struct task_struct *, int, const struct sched_param *);
 extern int sched_setscheduler_nocheck(struct task_struct *, int, const struct sched_param *);
+extern int sched_set_fifo(struct task_struct *p);
+extern int sched_set_fifo_low(struct task_struct *p);
+extern int sched_set_normal(struct task_struct *p, int nice);
 extern int sched_setattr(struct task_struct *, const struct sched_attr *);
+extern int sched_setattr_nocheck(struct task_struct *, const struct sched_attr *);
 extern struct task_struct *idle_task(int cpu);
 
 /**

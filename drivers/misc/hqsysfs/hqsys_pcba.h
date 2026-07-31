@@ -1,6 +1,7 @@
 #ifndef HQSYS_PCBA
 #define HQSYS_PCBA
 
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
 
 typedef enum {
@@ -40,6 +41,9 @@ typedef enum {
 	PCBA_J19P_INDIA,
 } PCBA_J19_CONFIG;
 #elif defined(TARGET_PRODUCT_SELENE)
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-147481 by liunianliang at 2021/07/27 start */
 typedef enum
 {

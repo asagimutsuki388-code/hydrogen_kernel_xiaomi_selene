@@ -357,7 +357,12 @@ void disp_helper_option_init(void)
 
 	/* =================Begin: lowpower option setting================= */
 	disp_helper_set_option(DISP_OPT_SODI_SUPPORT, 1);
+#ifdef CONFIG_MTK_DISP_IDLE_MGR_DISABLE
+        disp_helper_set_option(DISP_OPT_IDLE_MGR, 0);
+        DISPERR("%s:set DISP_OPT_IDLE_MGR 0", __func__);
+#else
 	disp_helper_set_option(DISP_OPT_IDLE_MGR, 1);
+#endif
 
 	/* 1. vdo mode + screen idle(need idlemgr) */
 	disp_helper_set_option(DISP_OPT_IDLEMGR_SWTCH_DECOUPLE,	1);
@@ -390,7 +395,7 @@ void disp_helper_option_init(void)
 	disp_helper_set_option(DISP_OPT_BYPASS_OVL, 0);
 	disp_helper_set_option(DISP_OPT_FPS_CALC_WND, 10);
 	/* report external fps statistics */
-	disp_helper_set_option(DISP_OPT_FPS_EXT, 1);
+	disp_helper_set_option(DISP_OPT_FPS_EXT, 0);
 	/* set external fps interval (ms) */
 	disp_helper_set_option(DISP_OPT_FPS_EXT_INTERVAL, 1000);
 	disp_helper_set_option(DISP_OPT_SMART_OVL, 0);
@@ -425,8 +430,8 @@ void disp_helper_option_init(void)
 	/* OVL SBCH */
 	disp_helper_set_option(DISP_OPT_OVL_SBCH, 1);
 	disp_helper_set_option(DISP_OPT_GMO_OPTIMIZE, 1);
-	disp_helper_set_option(DISP_OPT_DSI_UNDERRUN_AEE, 1);
-	disp_helper_set_option(DISP_OPT_RDMA_UNDERFLOW_AEE, 1);
+	disp_helper_set_option(DISP_OPT_DSI_UNDERRUN_AEE, 0);
+	disp_helper_set_option(DISP_OPT_RDMA_UNDERFLOW_AEE, 0);
 	disp_helper_set_option(DISP_OPT_TUI_MODE, 0);
 	/*DynFPS*/
 	disp_helper_set_option(DISP_OPT_DYNAMIC_FPS, 1);

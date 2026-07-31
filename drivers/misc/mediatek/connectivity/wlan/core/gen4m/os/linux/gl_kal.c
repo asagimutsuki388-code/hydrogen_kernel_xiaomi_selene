@@ -97,10 +97,13 @@
 #include <linux/module.h>
 #include <linux/debugfs.h>
 
+<<<<<<< HEAD
 /* for pm */
 #include <linux/suspend.h>
 #include <linux/notifier.h>
 
+=======
+>>>>>>> 4ccec69
 /* for uevent */
 #include <linux/miscdevice.h>   /* for misc_register, and SYNTH_MINOR */
 #include <linux/kobject.h>
@@ -153,6 +156,7 @@ u_int8_t wlan_perf_monitor_force_enable = FALSE;
 #endif
 
 static struct notifier_block wlan_fb_notifier;
+<<<<<<< HEAD
 
 static int wlan_fb_notifier_callback(struct notifier_block
 				*self, unsigned long event, void *data);
@@ -167,6 +171,9 @@ static struct notifier_block wlan_fb_notifier = {
 static struct notifier_block wlan_pm_notifier = {
 	.notifier_call = wlan_pm_notifier_callback
 };
+=======
+void *wlan_fb_notifier_priv_data;
+>>>>>>> 4ccec69
 
 static struct miscdevice wlan_object;
 /*******************************************************************************
@@ -8070,7 +8077,11 @@ void kalSetRpsMap(IN struct GLUE_INFO *glue, IN unsigned long value)
 int32_t kalPerMonSetForceEnableFlag(uint8_t uFlag)
 {
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)
+<<<<<<< HEAD
 				       wlan_notifier_priv_data;
+=======
+				       wlan_fb_notifier_priv_data;
+>>>>>>> 4ccec69
 
 	wlan_perf_monitor_force_enable = uFlag == 0 ? FALSE : TRUE;
 	DBGLOG(SW4, INFO,
@@ -8090,7 +8101,11 @@ static int wlan_fb_notifier_callback(struct notifier_block
 	struct fb_event *evdata = data;
 	int32_t blank = 0;
 	struct GLUE_INFO *prGlueInfo = (struct GLUE_INFO *)
+<<<<<<< HEAD
 				       wlan_notifier_priv_data;
+=======
+				       wlan_fb_notifier_priv_data;
+>>>>>>> 4ccec69
 
 	/* If we aren't interested in this event, skip it immediately ... */
 	if ((event != FB_EVENT_BLANK) || !prGlueInfo)
@@ -8124,6 +8139,7 @@ static int wlan_fb_notifier_callback(struct notifier_block
 	return 0;
 }
 
+<<<<<<< HEAD
 int32_t kalNotifierReg(IN struct GLUE_INFO *prGlueInfo)
 {
 	int32_t i4Ret;
@@ -8191,6 +8207,28 @@ void kalNotifierUnReg(void)
 	fb_unregister_client(&wlan_fb_notifier);
 	unregister_pm_notifier(&wlan_pm_notifier);
 	wlan_notifier_priv_data = NULL;
+=======
+int32_t kalFbNotifierReg(IN struct GLUE_INFO *prGlueInfo)
+{
+	int32_t i4Ret;
+
+	wlan_fb_notifier_priv_data = prGlueInfo;
+	wlan_fb_notifier.notifier_call = wlan_fb_notifier_callback;
+
+	i4Ret = fb_register_client(&wlan_fb_notifier);
+	if (i4Ret)
+		DBGLOG(SW4, WARN, "Register wlan_fb_notifier failed:%d\n",
+		       i4Ret);
+	else
+		DBGLOG(SW4, TRACE, "Register wlan_fb_notifier succeed\n");
+	return i4Ret;
+}
+
+void kalFbNotifierUnReg(void)
+{
+	fb_unregister_client(&wlan_fb_notifier);
+	wlan_fb_notifier_priv_data = NULL;
+>>>>>>> 4ccec69
 }
 
 #if CFG_SUPPORT_DFS

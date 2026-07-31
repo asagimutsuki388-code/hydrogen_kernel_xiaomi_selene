@@ -81,7 +81,11 @@ MODULE_DEVICE_TABLE(of, msm_match_table);
 #define MSG_PROP_GID         0x4F
 #define ESE_CLD_RST_OID      0x1E
 #define ESE_CLD_RST_RSP_SIZE 0x04
+<<<<<<< HEAD
 #define WAKEUP_SRC_TIMEOUT		(2000)
+=======
+#define WAKEUP_SRC_TIMEOUT		(3000)
+>>>>>>> 4ccec69
 
 extern int force_sig_info(int, struct siginfo *, struct task_struct *);
 
@@ -1724,6 +1728,10 @@ static int pn544_remove(struct i2c_client *client)
 	unregister_reboot_notifier(&nfcc_notifier);
 	free_irq(client->irq, pn544_dev);
 	misc_deregister(&pn544_dev->pn544_device);
+<<<<<<< HEAD
+=======
+	pm_relax(&client->dev);
+>>>>>>> 4ccec69
 	mutex_destroy(&pn544_dev->read_mutex);
 	mutex_destroy(&pn544_dev->p61_state_mutex);
 	gpio_free(pn544_dev->irq_gpio);
@@ -1750,6 +1758,10 @@ static int nqx_suspend(struct device *device)
 	struct pn544_dev *pn544_dev = i2c_get_clientdata(client);
 
 	if (device_may_wakeup(&client->dev) && pn544_dev->irq_enabled) {
+<<<<<<< HEAD
+=======
+		device_wakeup_disable(&client->dev);
+>>>>>>> 4ccec69
 		if (!enable_irq_wake(client->irq))
 			pn544_dev->irq_wake_up = true;
 	}
@@ -1762,6 +1774,10 @@ static int nqx_resume(struct device *device)
 	struct pn544_dev *pn544_dev = i2c_get_clientdata(client);
 
 	if (device_may_wakeup(&client->dev) && pn544_dev->irq_wake_up) {
+<<<<<<< HEAD
+=======
+		device_wakeup_enable(&client->dev);
+>>>>>>> 4ccec69
 		if (!disable_irq_wake(client->irq))
 			pn544_dev->irq_wake_up = false;
 	}

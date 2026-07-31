@@ -973,6 +973,10 @@ static void fuse_send_init(struct fuse_conn *fc, struct fuse_req *req)
 		FUSE_FLOCK_LOCKS | FUSE_HAS_IOCTL_DIR | FUSE_AUTO_INVAL_DATA |
 		FUSE_DO_READDIRPLUS | FUSE_READDIRPLUS_AUTO | FUSE_ASYNC_DIO |
 		FUSE_WRITEBACK_CACHE | FUSE_NO_OPEN_SUPPORT |
+<<<<<<< HEAD
+=======
+		FUSE_PARALLEL_DIROPS | FUSE_HANDLE_KILLPRIV | FUSE_POSIX_ACL |
+>>>>>>> 4ccec69
 		FUSE_PASSTHROUGH | FUSE_ABORT_ERROR;
 	req->in.h.opcode = FUSE_INIT;
 	req->in.numargs = 1;
@@ -995,6 +999,10 @@ static int free_fuse_passthrough(int id, void *p, void *data)
 
 	fuse_passthrough_release(passthrough);
 	kfree(p);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4ccec69
 	return 0;
 }
 

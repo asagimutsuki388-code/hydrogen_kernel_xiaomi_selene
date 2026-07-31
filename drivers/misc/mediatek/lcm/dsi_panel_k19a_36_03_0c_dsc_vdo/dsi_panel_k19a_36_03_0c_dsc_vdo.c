@@ -137,11 +137,18 @@ extern bool fts_gesture_flag;
 /*K19S code for HQ-168893 by gaoxue at 2021/11/23 start*/
 extern int32_t fts_ts_tp_suspend(void);
 extern int32_t fts_ts_tp_resume(void);
+<<<<<<< HEAD
 extern bool esd_flag;
 /*K19S code for HQ-168893 by gaoxue at 2021/11/23 end*/
 
 #ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
 
+=======
+/*K19S code for HQ-168893 by gaoxue at 2021/11/23 end*/
+
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+extern bool esd_flag;
+>>>>>>> 4ccec69
 #endif
 /*****************************************************************************
  * Function Prototype
@@ -310,10 +317,14 @@ static void push_table(void *cmdq, struct LCM_setting_table *table,
 		cmd = table[i].cmd;
 		switch (cmd) {
 		case REGFLAG_DELAY:
+<<<<<<< HEAD
 			if (table[i].count <= 10)
 				MDELAY(table[i].count);
 			else
 				MDELAY(table[i].count);
+=======
+			MDELAY(table[i].count);
+>>>>>>> 4ccec69
 			break;
 		case REGFLAG_UDELAY:
 			UDELAY(table[i].count);
@@ -574,24 +585,40 @@ static void lcm_init(void)
 	fts_fwresume_work();
 	/*K19A coad for HQ-147450 by feiwen at 2021/7/23 end*/
 	push_table(NULL, init_setting_vdo, ARRAY_SIZE(init_setting_vdo), 1);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+>>>>>>> 4ccec69
 /*K19S code for HQ-168893 by gaoxue at 2021/11/23 start*/
 	if (esd_flag == true) {
 	    LCM_LOGI("%s, Now esd_flag = %d\n", __func__, esd_flag);
 	    fts_ts_tp_resume();
 	}
 /*K19S code for HQ-168893 by gaoxue at 2021/11/23 end*/
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 }
 
 static void lcm_suspend(void)
 {
 
 	LCM_LOGI("[DENNIS][%s][%d]\n", __func__, __LINE__);
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+>>>>>>> 4ccec69
 /*K19S code for HQ-168893 by gaoxue at 2021/11/23 start*/
 	if (esd_flag == true) {
 	    LCM_LOGI("%s, Now esd_flag = %d\n", __func__, esd_flag);
 	    fts_ts_tp_suspend();
 	}
 /*K19S code for HQ-168893 by gaoxue at 2021/11/23 end*/
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 	push_table(NULL, lcm_suspend_setting,
 		   ARRAY_SIZE(lcm_suspend_setting), 1);
 }

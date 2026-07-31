@@ -12,4 +12,7 @@
 
 obj-y += ut_tester.o
 # ccflags-y += -Werror
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4ccec69

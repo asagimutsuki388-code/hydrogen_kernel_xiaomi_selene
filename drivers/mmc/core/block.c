@@ -38,6 +38,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/idr.h>
 #include <linux/debugfs.h>
+#include <linux/math64.h>
 
 #include <linux/mmc/ioctl.h>
 #include <linux/mmc/card.h>
@@ -1023,24 +1024,29 @@ static int mmc_blk_check_disk_range_wp(struct gendisk *disk,
 
 	start = part_start;
 	quot = start;
-	remain = do_div(quot, card->wp_grp_size);
+	quot = div_u64_rem(quot, card->wp_grp_size, &remain);
 	if (remain) {
+<<<<<<< HEAD
 		pr_debug("Start 0x%llx of disk %s not write group aligned\n",
 			(unsigned long long)part_start, disk->disk_name);
+=======
+>>>>>>> 4ccec69
 		start -= remain;
 	}
 
 	end = part_start + part_nr_sects;
 	quot = end;
-	remain = do_div(quot, card->wp_grp_size);
+	quot = div_u64_rem(quot, card->wp_grp_size, &remain);
 	if (remain) {
+<<<<<<< HEAD
 		pr_debug("End 0x%llx of disk %s not write group aligned\n",
 			(unsigned long long)part_start, disk->disk_name);
+=======
+>>>>>>> 4ccec69
 		end += card->wp_grp_size - remain;
 	}
 	wp_grp_total = end - start;
-	do_div(wp_grp_total, card->wp_grp_size);
-	wp_grp_rem = wp_grp_total;
+	wp_grp_rem = div_u64(wp_grp_total, card->wp_grp_size);
 	wp_grp_found = 0;
 
 	cmd.opcode = MMC_SEND_WRITE_PROT_TYPE;
@@ -1289,7 +1295,8 @@ static const struct block_device_operations mmc_bdops = {
 static int mmc_blk_part_switch_pre(struct mmc_card *card,
 				   unsigned int part_type)
 {
-	const unsigned int mask = EXT_CSD_PART_CONFIG_ACC_RPMB;
+	const unsigned int mask = EXT_CSD_PART_CONFIG_ACC_MASK;
+	const unsigned int rpmb = EXT_CSD_PART_CONFIG_ACC_RPMB;
 	int ret = 0;
 
 #if defined(CONFIG_MTK_EMMC_CQ_SUPPORT) || defined(CONFIG_MTK_EMMC_HW_CQ)
@@ -1302,10 +1309,17 @@ static int mmc_blk_part_switch_pre(struct mmc_card *card,
 		if (ret)
 			return ret;
 	}
+<<<<<<< HEAD
 	if ((part_type & mask) == mask)
 		mmc_retune_pause(card->host);
 #else
 	if ((part_type & mask) == mask) {
+=======
+	if ((part_type & mask) == rpmb)
+		mmc_retune_pause(card->host);
+#else
+	if ((part_type & mask) == rpmb) {
+>>>>>>> 4ccec69
 		if (card->ext_csd.cmdq_en) {
 			ret = mmc_cmdq_disable(card);
 			if (ret)
@@ -1320,7 +1334,8 @@ static int mmc_blk_part_switch_pre(struct mmc_card *card,
 static int mmc_blk_part_switch_post(struct mmc_card *card,
 				    unsigned int part_type)
 {
-	const unsigned int mask = EXT_CSD_PART_CONFIG_ACC_RPMB;
+	const unsigned int mask = EXT_CSD_PART_CONFIG_ACC_MASK;
+	const unsigned int rpmb = EXT_CSD_PART_CONFIG_ACC_RPMB;
 	int ret = 0;
 
 #if defined(CONFIG_MTK_EMMC_CQ_SUPPORT) || defined(CONFIG_MTK_EMMC_HW_CQ)
@@ -1337,7 +1352,11 @@ static int mmc_blk_part_switch_post(struct mmc_card *card,
 	}
 #else
 
+<<<<<<< HEAD
 	if ((part_type & mask) == mask) {
+=======
+	if ((part_type & mask) == rpmb) {
+>>>>>>> 4ccec69
 		mmc_retune_unpause(card->host);
 		if (card->reenable_cmdq && !card->ext_csd.cmdq_en)
 			ret = mmc_cmdq_enable(card);
@@ -2701,7 +2720,7 @@ static struct mmc_cmdq_req *mmc_blk_cmdq_rw_prep(
 	 * call it in CQHCI for safe, SWcmdq will do this in
 	 * mmc_blk_swcq_issue_rw_rq().
 	 */
-#ifndef CONFIG_MTK_EMMC_CQ_SUPPORT
+#ifdef CONFIG_MTK_EMMC_HW_CQ
 	mmc_crypto_prepare_req(mqrq);
 #endif
 #ifdef MMC_CQHCI_DEBUG

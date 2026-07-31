@@ -385,6 +385,7 @@ int lm3697_set_brightness(int brightness)
 	/* Huaqin modify for K19A-271 by caogaojie at 2021/07/08 end */
 	//return ti_lmu_backlight_update_brightness_register(bl_chip->lmu_bl, brightness);
 
+<<<<<<< HEAD
 #ifdef CONFIG_TARGET_PRODUCT_MERLINCOMMON
 	if ((brightness < 6) && (brightness > 2)) {//HQ-61731
 		brightness = 6;
@@ -392,6 +393,8 @@ int lm3697_set_brightness(int brightness)
 	}
 #endif
 
+=======
+>>>>>>> 4ccec69
 	return ti_lmu_backlight_set_brightness(brightness);
 }
 

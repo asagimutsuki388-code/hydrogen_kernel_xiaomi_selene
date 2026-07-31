@@ -282,7 +282,11 @@ do { if (gHifSdioDbgLvl >= HIF_SDIO_LOG_ERR)	\
 		} \
 }
 #else
+<<<<<<< HEAD
 #define HIF_SDIO_ASSERT(expr)    do {} while (0)
+=======
+#define HIF_SDIO_ASSERT(expr)    ((void)0)
+>>>>>>> 4ccec69
 #endif
 
 /* define function 0 CR */

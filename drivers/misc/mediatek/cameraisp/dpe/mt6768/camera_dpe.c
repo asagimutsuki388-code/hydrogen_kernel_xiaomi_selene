@@ -4788,12 +4788,21 @@ if (bResulst == MTRUE) {
 	}
 
 	LOG_INF("DVE:bFound:%d, DveWriteIdx:%d, WriteIdx:%d\n",
+<<<<<<< HEAD
 	bFound, DveWriteIdx,
 	g_DVE_RequestRing.WriteIdx);
 	LOG_INF("DVE:gDveCnt:%d,RequestState:%d,HWIdx:%d\n",
 	gDveCnt,
 	g_DVE_RequestRing.DVEReq_Struct[DveWriteIdx].RequestState,
 	g_DVE_RequestRing.HWProcessIdx);
+=======
+		bFound, DveWriteIdx,
+		g_DVE_RequestRing.WriteIdx);
+		LOG_INF("DVE:gDveCnt:%d,RequestState:%d,HWIdx:%d\n",
+		gDveCnt,
+		g_DVE_RequestRing.DVEReq_Struct[DveWriteIdx].RequestState,
+		g_DVE_RequestRing.HWProcessIdx);
+>>>>>>> 4ccec69
 
 	if (bResulst == MTRUE) {
 		wake_up_interruptible(&DPEInfo.WaitQueueHead);

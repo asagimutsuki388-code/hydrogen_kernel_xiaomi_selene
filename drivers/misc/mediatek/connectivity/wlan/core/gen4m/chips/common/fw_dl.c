@@ -2354,12 +2354,21 @@ uint32_t wlanDownloadPatch(IN struct ADAPTER *prAdapter)
 	}
 
 #if (CFG_ROM_PATCH_NO_SEM_CTRL == 0)
+<<<<<<< HEAD
+=======
+#pragma message("ROM code supports SEM-CTRL for ROM patch download")
+>>>>>>> 4ccec69
 	if (wlanPatchIsDownloaded(prAdapter)) {
 		kalFirmwareImageUnmapping(prAdapter->prGlueInfo, NULL,
 					  prFwBuffer);
 		DBGLOG(INIT, INFO, "No need to download patch\n");
 		return WLAN_STATUS_SUCCESS;
 	}
+<<<<<<< HEAD
+=======
+#else
+#pragma message("ROM code supports no SEM-CTRL for ROM patch download")
+>>>>>>> 4ccec69
 #endif
 
 	/* Patch DL */

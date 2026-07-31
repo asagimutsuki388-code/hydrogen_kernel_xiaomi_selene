@@ -988,6 +988,7 @@ static int xhci_mtk_remove(struct platform_device *dev)
 
 	xhci->xhc_state |= XHCI_STATE_REMOVING;
 
+<<<<<<< HEAD
 #if IS_ENABLED(CONFIG_MACH_MT6853)
 	if (mtk->last_speed == DEV_SPEED_FULL) {
 		ssusb_set_phy_mode(DEV_SPEED_INACTIVE);
@@ -995,6 +996,8 @@ static int xhci_mtk_remove(struct platform_device *dev)
 	}
 #endif
 
+=======
+>>>>>>> 4ccec69
 	usb_remove_hcd(shared_hcd);
 	xhci->shared_hcd = NULL;
 	xhci_mtk_phy_power_off(mtk);

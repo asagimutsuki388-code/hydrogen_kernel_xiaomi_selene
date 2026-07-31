@@ -108,10 +108,13 @@ struct kbase_aliased {
  * @gpu_mappings: count number of times mapped on the GPU. Indicates the number
  *                of references there are to the physical pages from different
  *                GPU VA regions.
+<<<<<<< HEAD
  * @kernel_mappings: count number of times mapped on the CPU, specifically in
  *                   the kernel. Indicates the number of references there are
  *                   to the physical pages to prevent flag changes or shrink
  *                   while maps are still held.
+=======
+>>>>>>> 4ccec69
  * @nents: 0..N
  * @pages: N elements, only 0..nents are valid
  * @mappings: List of CPU mappings of this physical memory allocation.

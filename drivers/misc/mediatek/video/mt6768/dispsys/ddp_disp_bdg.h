@@ -24,18 +24,24 @@
 #define HW_NUM			(2)
 /* Huaqin modify for HQ-145957 by liunianliang at 2021/07/12 end */
 #define RX_V12			(1720)
+<<<<<<< HEAD
 #define _90HZ_
+=======
+>>>>>>> 4ccec69
 #define _n36672c_
 #define _Disable_HS_DCO_
 #define _Disable_LP_TX_L023_
 //#define _G_MODE_EN_
 //#define _RX_V12_
 //#define _HIGH_FRM_
+<<<<<<< HEAD
 #ifdef _HIGH_FRM_	 //for cmd 120Hz
 #define RXTX_RATIO		(299)
 #else
 #define RXTX_RATIO		(225) //for vdo 90Hz
 #endif
+=======
+>>>>>>> 4ccec69
 
 enum DISP_BDG_ENUM {
 	DISP_BDG_DSI0 = 0,
@@ -91,6 +97,10 @@ int bdg_tx_bist_pattern(enum DISP_BDG_ENUM module,
 int bdg_tx_set_mode(enum DISP_BDG_ENUM module,
 				void *cmdq, unsigned int mode);
 int bdg_mipi_clk_change(int msg, int en);
+<<<<<<< HEAD
+=======
+int bdg_mipi_clk_change_for_resume(int msg, int en);
+>>>>>>> 4ccec69
 int bdg_tx_start(enum DISP_BDG_ENUM module, void *cmdq);
 int bdg_tx_stop(enum DISP_BDG_ENUM module, void *cmdq);
 int bdg_tx_cmd_mode(enum DISP_BDG_ENUM module, void *cmdq);

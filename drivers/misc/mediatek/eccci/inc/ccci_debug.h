@@ -62,7 +62,11 @@ do { \
 } while (0)
 
 #define CCCI_LEGACY_ERR_LOG(idx, tag, fmt, args...) \
+<<<<<<< HEAD
 	pr_err("[ccci%d/" tag "]" fmt, (idx+1), ##args)
+=======
+	pr_debug("[ccci%d/" tag "]" fmt, (idx+1), ##args)
+>>>>>>> 4ccec69
 
 /*--------------------------------------------------------------------------*/
 /* This log is used for driver init and part of first boot up log */

@@ -452,10 +452,14 @@ static void push_table(void *cmdq, struct LCM_setting_table *table,
 		cmd = table[i].cmd;
 		switch (cmd) {
 		case REGFLAG_DELAY:
+<<<<<<< HEAD
 			if (table[i].count <= 10)
 				MDELAY(table[i].count);
 			else
 				MDELAY(table[i].count);
+=======
+			MDELAY(table[i].count);
+>>>>>>> 4ccec69
 			break;
 		case REGFLAG_UDELAY:
 			UDELAY(table[i].count);
@@ -573,6 +577,7 @@ static void lcm_get_params(struct LCM_PARAMS *params)
 
 	params->dsi.PS = LCM_PACKED_PS_24BIT_RGB888;
 
+<<<<<<< HEAD
 	params->dsi.vertical_sync_active = 10;
 	params->dsi.vertical_backporch = 10;
 	params->dsi.vertical_frontporch = 54;
@@ -584,6 +589,21 @@ static void lcm_get_params(struct LCM_PARAMS *params)
 	params->dsi.horizontal_frontporch = 165;
 	params->dsi.horizontal_active_pixel = FRAME_WIDTH;
 	params->dsi.ssc_disable = 1;
+=======
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+	params->dsi.vertical_sync_active = 10;
+	params->dsi.vertical_backporch = 10;
+	params->dsi.vertical_frontporch = 46;
+	//params->dsi.vertical_frontporch_for_low_power = 750;
+	params->dsi.vertical_active_line = FRAME_HEIGHT;
+
+	params->dsi.horizontal_sync_active = 16;
+	params->dsi.horizontal_backporch = 16;
+	params->dsi.horizontal_frontporch = 148;
+	params->dsi.horizontal_active_pixel = FRAME_WIDTH;
+	params->dsi.ssc_disable = 1;
+	/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 #ifdef CONFIG_MTK_MT6382_BDG
 	params->dsi.bdg_ssc_disable = 1;
 	params->dsi.dsc_params.ver = 17;
@@ -623,8 +643,15 @@ static void lcm_get_params(struct LCM_PARAMS *params)
 #ifndef CONFIG_FPGA_EARLY_PORTING
 	/* this value must be in MTK suggested table */
 #ifdef DSC_ENABLE
+<<<<<<< HEAD
 	params->dsi.bdg_dsc_enable = 1;
 	params->dsi.PLL_CLOCK = 380; //with dsc
+=======
+	/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+    params->dsi.bdg_dsc_enable = 1;
+    params->dsi.PLL_CLOCK = 360; //with dsc
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 #else
 	params->dsi.bdg_dsc_enable = 0;
 	params->dsi.PLL_CLOCK = 574; //without dsc
@@ -756,6 +783,10 @@ static void lcm_init(void)
 	MDELAY(10);
 	/* Huaqin modify for HQ-132702 by caogaojie at 2021/06/15 end */
 	/* Huaqin modify for HQ-132702 by liunianliang at 2021/05/20 end */
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+>>>>>>> 4ccec69
 	/* Huaqin modify for HQ-161950 by jiangyue at 2021/11/05 start */
 	if(esd_flag){
 		nvt_bootloader_reset_locked();
@@ -769,6 +800,10 @@ static void lcm_init(void)
 		g_trigger_disp_esd_recovery = false;
 	}
 	/* Huaqin modify for HQ-161950 by jiangyue at 2021/11/05 end */
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 
 	/* Huaqin modify for HQ-140017 by caogaojie at 2021/07/14 start */
 	/* Huaqin modify for HQ-155949 by caogaojie at 2021/09/18 start */

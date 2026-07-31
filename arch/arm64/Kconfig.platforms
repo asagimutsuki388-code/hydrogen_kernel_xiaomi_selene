@@ -269,16 +269,22 @@ config MACH_MT6768
 	select CPU_IDLE
 	select MTK_BASE_POWER
 	select MTK_GIC_V3_EXT
-	select MTK_PID_MAP
 	select MTK_SYSIRQ
+<<<<<<< HEAD
 	select MTK_PLAT_SRAM_FLAG
+=======
+>>>>>>> 4ccec69
 	select MTK_EMI
 	select MTK_DRAMC
 	select ARM64_CRYPTO
 	select CRYPTO_SHA2_ARM64_CE
 	select CRYPTO_AES_ARM64_CE_BLK
+<<<<<<< HEAD
 	select MTK_CACHE_PARITY_CHECK
 	select MTK_LASTBUS_INTERFACE
+=======
+	select SDCARD_FS
+>>>>>>> 4ccec69
 	select MTK_ES_REG
 	select MTK_CQDMA
 	select MTK_GIC_TARGET_ALL

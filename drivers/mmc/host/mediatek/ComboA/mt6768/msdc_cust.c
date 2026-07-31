@@ -473,7 +473,11 @@ int msdc_get_ccf_clk_pointer(struct platform_device *pdev,
 		pr_debug("[msdc%d] can not get clock control\n", pdev->id);
 		return 1;
 	}
+<<<<<<< HEAD
 	if (clk_prepare(host->clk_ctl)) {
+=======
+	if (clk_prepare_enable(host->clk_ctl)) {
+>>>>>>> 4ccec69
 		pr_debug("[msdc%d] can not prepare clock control\n", pdev->id);
 		return 1;
 	}
@@ -482,7 +486,11 @@ int msdc_get_ccf_clk_pointer(struct platform_device *pdev,
 		pr_debug("[msdc%d] can not get clock control\n", pdev->id);
 		return 1;
 	}
+<<<<<<< HEAD
 	if (hclk_names[pdev->id] && clk_prepare(host->hclk_ctl)) {
+=======
+	if (hclk_names[pdev->id] && clk_prepare_enable(host->hclk_ctl)) {
+>>>>>>> 4ccec69
 		pr_debug("[msdc%d] can not prepare hclock control\n",
 			pdev->id);
 		return 1;
@@ -498,7 +506,11 @@ int msdc_get_ccf_clk_pointer(struct platform_device *pdev,
 			WARN_ON(1);
 			return 1;
 		}
+<<<<<<< HEAD
 		if (clk_prepare(host->aes_clk_ctl)) {
+=======
+		if (clk_prepare_enable(host->aes_clk_ctl)) {
+>>>>>>> 4ccec69
 			pr_debug(
 				"[msdc%d] can not prepare aes clock control\n",
 				pdev->id);
@@ -1133,7 +1145,7 @@ int msdc_of_parse(struct platform_device *pdev, struct mmc_host *mmc)
 	struct msdc_host *host = mmc_priv(mmc);
 	int ret = 0;
 	int len = 0;
-	u8 id;
+	u8 id = 0;
 	const char *dup_name;
 
 	np = mmc->parent->of_node; /* mmcx node in project dts */

@@ -54,6 +54,7 @@ config ANDROID_BINDER_IPC_SELFTEST
 	  exhaustively with combinations of various buffer sizes and
 	  alignments.
 
+<<<<<<< HEAD
 config TARGET_PRODUCT_MERLINCOMMON
 	bool "TARGET PRODUCT MERLINCOMMON"
 	---help---
@@ -64,16 +65,21 @@ config TARGET_PRODUCT_LANCELOTCOMMON
 	---help---
 	  Enable support for TARGET PRODUCT LANCELOTCOMMON
 
+=======
+>>>>>>> 4ccec69
 config TARGET_PRODUCT_SELENECOMMON
 	bool "TARGET PRODUCT SELENECOMMON"
 	---help---
 	  Enable support for TARGET PRODUCT SELENECOMMON
 
+<<<<<<< HEAD
 config TARGET_PRODUCT_SHIVACOMMON
 	bool "TARGET PRODUCT SHIVACOMMON"
 	---help---
 	  Enable support for TARGET PRODUCT SHIVACOMMON
 
+=======
+>>>>>>> 4ccec69
 endif # if ANDROID
 
 endmenu

@@ -48,6 +48,7 @@ KBUILD_CFLAGS += -D__SELENE_COMMON__
 endif
 endif
 
+<<<<<<< HEAD
 ifeq ($(TARGET_PRODUCT),$(filter $(TARGET_PRODUCT),merlin merlinin merlinnfc))
 KBUILD_CFLAGS += -DMERLIN_MSM_CAMERA_HW_INFO
 else ifeq ($(TARGET_PRODUCT),$(filter $(TARGET_PRODUCT),lancelot lanclotin lancelotnfc))
@@ -58,5 +59,9 @@ else ifeq ($(TARGET_PRODUCT),$(filter $(TARGET_PRODUCT),galahad galahadin galaha
 KBUILD_CFLAGS += -DGALAHAD_MSM_CAMERA_HW_INFO
 else ifeq ($(TARGET_PRODUCT),$(filter $(TARGET_PRODUCT),shiva))
 KBUILD_CFLAGS += -DSHIVA_MSM_CAMERA_HW_INFO
+=======
+ifeq ($(TARGET_PRODUCT),$(filter $(TARGET_PRODUCT),selene selenein selenenfc))
+KBUILD_CFLAGS += -DSELENE_MSM_CAMERA_HW_INFO
+>>>>>>> 4ccec69
 else
 endif

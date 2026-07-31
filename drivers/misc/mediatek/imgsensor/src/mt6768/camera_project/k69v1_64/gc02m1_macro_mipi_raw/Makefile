@@ -11,4 +11,8 @@
 # GNU General Public License for more details.
 #
 
+<<<<<<<< HEAD:drivers/misc/mediatek/imgsensor/src/mt6768/camera_project/k69v1_64/gc02m1_macro_mipi_raw/Makefile
 obj-y += gc02m1_macro_mipiraw_Sensor.o
+========
+obj-y += gc02m1_macro_sunny_mipiraw_Sensor.o
+>>>>>>>> 4ccec69:drivers/misc/mediatek/imgsensor/src/mt6768/camera_project/k69v1_64/gc02m1_macro_sunny_mipi_raw/Makefile

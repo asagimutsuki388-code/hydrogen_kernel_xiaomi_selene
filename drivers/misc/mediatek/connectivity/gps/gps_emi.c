@@ -114,7 +114,11 @@
 /******************************************************************************
  * Debug configuration
 ******************************************************************************/
+<<<<<<< HEAD
 #define GPS_DBG_NONE(fmt, arg...)    do {} while (0)
+=======
+#define GPS_DBG_NONE(fmt, arg...)    ((void)0)
+>>>>>>> 4ccec69
 #define GPS_DBG pr_err
 #define GPS_TRC GPS_DBG_NONE
 #define GPS_VER pr_err

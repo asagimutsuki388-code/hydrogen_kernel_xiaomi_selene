@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015 MediaTek Inc.
+ * Copyright (C) 2021 XiaoMi, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 as
@@ -148,12 +149,18 @@ int setMaxbrightness(int max_level, int enable)
 	disp_bls_set_max_backlight(((((1 << LED_INTERNAL_LEVEL_BIT_CNT) -
 				      1) * max_level + 127) / 2047));
 	if (thermal_current_brightness >= max_level) {
+<<<<<<< HEAD
 		//disp_aal_notify_backlight_changed(thermal_current_brightness);
+=======
+>>>>>>> 4ccec69
 		disp_aal_notify_backlight_changed(max_level);
 	} else if ((thermal_current_brightness > 0) && (thermal_current_brightness < max_level)) {
 		disp_aal_notify_backlight_changed(thermal_current_brightness);
 	}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4ccec69
 #endif
 	return 0;
 }

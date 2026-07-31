@@ -402,10 +402,6 @@ int _ioctl_prepare_present_fence(unsigned long arg)
 			__LINE__);
 		ret = -EFAULT;
 	}
-	mmprofile_log_ex(ddp_mmp_get_events()->present_fence_get,
-		MMPROFILE_FLAG_PULSE,
-		pnt_fence.present_fence_fd,
-		pnt_fence.present_fence_index);
 	DISPPR_FENCE("P+/%s%d/L%d/id%d/fd%d\n",
 		disp_session_mode_spy(pnt_fence.session_id),
 		DISP_SESSION_DEV(pnt_fence.session_id), timeline_id,
@@ -1561,6 +1557,7 @@ const char *_session_ioctl_spy(unsigned int cmd)
 long mtk_disp_mgr_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
 	int ret = -1;
+	void __user *argp = (void __user *)arg;
 
 	switch (cmd) {
 	case DISP_IOCTL_CREATE_SESSION:
@@ -1617,7 +1614,14 @@ long mtk_disp_mgr_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		}
 	case DISP_IOCTL_GET_LCMINDEX:
 		{
-			return primary_display_get_lcm_index();
+			int lcm_index;
+			lcm_index = primary_display_get_lcm_index();
+			if (copy_to_user(argp, &lcm_index, sizeof(lcm_index))) {
+				DISPERR("mtk_disp_mgr_ioctl: handle get_lcm_index, copy_to_user_failed!\n");
+				return -EFAULT;
+			}
+			DISPDBG("%s: get lcm_index=%d\n", __func__, lcm_index);
+			return 0;
 		}
 	case DISP_IOCTL_QUERY_VALID_LAYER:
 		{

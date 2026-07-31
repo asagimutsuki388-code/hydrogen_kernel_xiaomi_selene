@@ -207,7 +207,11 @@ enum MTK_WCN_HIF_SDIO_ERR {
 		} \
 	}
 #else
+<<<<<<< HEAD
 #define ASSERT(expr)    do {} while (0)
+=======
+#define ASSERT(expr)    ((void)0)
+>>>>>>> 4ccec69
 #endif
 
 /*******************************************************************************

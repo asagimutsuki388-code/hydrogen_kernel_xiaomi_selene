@@ -63,7 +63,11 @@ struct screen_monitor sm;
 
 static atomic_t in_suspend;
 static bool power_off_triggered;
+<<<<<<< HEAD
 static atomic_t switch_mode = ATOMIC_INIT(10);
+=======
+static atomic_t switch_mode = ATOMIC_INIT(-1);
+>>>>>>> 4ccec69
 static atomic_t temp_state = ATOMIC_INIT(0);
 static atomic_t lighter_event = ATOMIC_INIT(0);
 static char boost_buf[128];
@@ -1190,6 +1194,7 @@ static ssize_t
 thermal_sconfig_store(struct device *dev,
 				struct device_attribute *attr, const char *buf, size_t len)
 {
+<<<<<<< HEAD
        int ret, val = -1;
 
        ret = kstrtoint(buf, 10, &val);
@@ -1198,6 +1203,14 @@ thermal_sconfig_store(struct device *dev,
 
        if (ret)
 	       return ret;
+=======
+       int val = -1;
+
+       val = simple_strtol(buf, NULL, 10);
+
+       atomic_set(&switch_mode, val);
+
+>>>>>>> 4ccec69
        return len;
 }
 
@@ -1232,6 +1245,7 @@ static ssize_t
 thermal_temp_state_store(struct device *dev,
 				struct device_attribute *attr, const char *buf, size_t len)
 {
+<<<<<<< HEAD
        int ret, val = -1;
 
        ret = kstrtoint(buf, 10, &val);
@@ -1240,6 +1254,14 @@ thermal_temp_state_store(struct device *dev,
 
        if (ret)
 	       return ret;
+=======
+       int val = -1;
+
+       val = simple_strtol(buf, NULL, 10);
+
+       atomic_set(&temp_state, val);
+
+>>>>>>> 4ccec69
        return len;
 }
 

@@ -216,10 +216,13 @@ static void swtp_init_delayed_work(struct work_struct *work)
 	int ret1 = 0;
 	/*Huaqin add for HQ-123513 by shiwenlong at 2021.4.01 end*/
 	struct device_node *node = NULL;
+<<<<<<< HEAD
 	struct swtp_t *swtp = container_of(to_delayed_work(work),
 	struct swtp_t, init_delayed_work);
 	int md_id;
 	int i, ret = 0;
+=======
+>>>>>>> 4ccec69
 #ifdef CONFIG_MTK_EIC
 	u32 ints[2] = { 0, 0 };
 	u32 ints1[2] = { 0, 0 };
@@ -233,6 +236,7 @@ static void swtp_init_delayed_work(struct work_struct *work)
 			"invalid md_id = %d\n", md_id);
 		return -1;
 	}
+<<<<<<< HEAD
 
 	CCCI_NORMAL_LOG(-1, SYS, "%s start\n", __func__);
 	CCCI_BOOTUP_LOG(-1, SYS, "%s start\n", __func__);
@@ -249,6 +253,12 @@ static void swtp_init_delayed_work(struct work_struct *work)
 			"%s: invalid md_id = %d\n", __func__, md_id);
 		goto SWTP_INIT_END;
 	}
+=======
+	swtp_data[md_id].md_id = md_id;
+	swtp_data[md_id].curr_mode = SWTP_EINT_PIN_PLUG_OUT;
+	spin_lock_init(&swtp_data[md_id].spinlock);
+	INIT_DELAYED_WORK(&swtp_data[md_id].delayed_work, swtp_tx_work);
+>>>>>>> 4ccec69
 
 	node = of_find_matching_node(NULL, swtp_of_match);
 	if (node) {
@@ -284,9 +294,12 @@ static void swtp_init_delayed_work(struct work_struct *work)
 				swtp_data[md_id].irq,
 				swtp_data[md_id].setdebounce,
 				swtp_data[md_id].eint_type);
+<<<<<<< HEAD
 				"%s:can't find swtp%d compatible node\n",
 				__func__, i);
 			ret = -3;
+=======
+>>>>>>> 4ccec69
 		}
 	} else {
 		CCCI_LEGACY_ERR_LOG(md_id, SYS,
@@ -308,12 +321,16 @@ static void swtp_init_delayed_work(struct work_struct *work)
 		printk("tpd, create_proc_entry swtp_gpio_status_ops failed\n");
 	}
 	/*Huaqin add for HQ-123513 by shiwenlong at 2021.4.01 end*/
+<<<<<<< HEAD
 
 SWTP_INIT_END:
 	CCCI_BOOTUP_LOG(md_id, SYS, "%s end: ret = %d\n", __func__, ret);
 	CCCI_NORMAL_LOG(md_id, SYS, "%s end: ret = %d\n", __func__, ret);
 
 	return;
+=======
+	return ret;
+>>>>>>> 4ccec69
 }
 
 int swtp_init(int md_id)

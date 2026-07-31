@@ -89,6 +89,7 @@ extern bool tp_charger_status;
 /* Huaqin modify for HQ-131628 by shujiawang at 2021/05/10 end */
 
 static DEFINE_MUTEX(consumer_mutex);
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
 typedef enum {
 	PCBA_UNKNOW = 0,
@@ -116,6 +117,9 @@ typedef enum {
 	PCBA_END,
 } PCBA_CONFIG;
 #elif defined(TARGET_PRODUCT_SELENE)
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-147481 by liunianliang at 2021/07/27 start */
 typedef enum
 {
@@ -979,10 +983,14 @@ void charger_manager_set_prop_system_temp_level(int temp_level)
 
 	pcba_to_thermal = get_huaqin_pcba_config();
 
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
 	if (pcba_to_thermal == PCBA_J19_MP_CN)
 		is_cn = true;
 #elif defined(TARGET_PRODUCT_SELENE)
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+>>>>>>> 4ccec69
 	/* Huaqin modify for HQ-147481 by liunianliang at 2021/07/27 start */
 	if (pcba_to_thermal == PCBA_K19B_MP_CN || pcba_to_thermal == PCBA_K19S_MP_CN)
 	/* Huaqin modify for HQ-147481 by liunianliang at 2021/07/27 end */

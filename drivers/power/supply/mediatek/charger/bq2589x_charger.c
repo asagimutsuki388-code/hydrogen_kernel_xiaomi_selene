@@ -1345,6 +1345,20 @@ static int bq2589x_detect_device(struct bq2589x *bq)
 
 static void bq2589x_dump_regs(struct bq2589x *bq)
 {
+<<<<<<< HEAD
+=======
+#if 0
+	int addr;
+	u8 val;
+	int ret;
+
+	for (addr = 0x0; addr <= 0x14; addr++) {
+		ret = bq2589x_read_byte(bq, addr, &val);
+		if (ret == 0)
+			pr_err("Reg[%.2x] = 0x%.2x\n", addr, val);
+	}
+#endif
+>>>>>>> 4ccec69
 }
 
 static ssize_t

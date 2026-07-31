@@ -714,7 +714,7 @@ emit_cond_jmp:
 			emit(A64_ADD(1, tmp, tmp, dst), ctx);
 			reg = tmp;
 		}
-		if (cpus_have_cap(ARM64_HAS_LSE_ATOMICS)) {
+		if (IS_ENABLED(CONFIG_ARM64_USE_LSE_ATOMICS)) {
 			emit(A64_STADD(isdw, reg, src), ctx);
 		} else {
 			emit(A64_LDXR(isdw, tmp2, reg), ctx);
@@ -852,7 +852,7 @@ struct bpf_prog *bpf_int_jit_compile(struct bpf_prog *prog)
 	int image_size;
 	u8 *image_ptr;
 
-	if (!bpf_jit_enable)
+	if (!prog->jit_requested)
 		return orig_prog;
 
 	tmp = bpf_jit_blind_constants(prog);

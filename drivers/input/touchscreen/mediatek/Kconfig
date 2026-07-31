@@ -41,20 +41,6 @@ config TOUCHSCREEN_MTK_SOLOMON
 	  To compile this dirver as a module, choose M here: the
 	  module will be called.
 
-
-config TOUCHSCREEN_MTK_FOCALTECH_TS
-	bool "FOCALTECH_TS for Mediatek package"
-	default n
-	help
-	  Say Y here if you have focaltech_touch touch panel.
-
-	  If unsure, say N.
-
-	  To compile this dirver as a module, choose M here: the
-	  module will be called.
-
-source "drivers/input/touchscreen/mediatek/focaltech_touch/Kconfig"
-
 config TOUCHSCREEN_MTK_GT1151
 	bool "GT1151 for Mediatek package"
 	default n
@@ -149,13 +135,6 @@ config TOUCHSCREEN_MTK_GT911
 
 source "drivers/input/touchscreen/mediatek/GT911/Kconfig"
 
-config TOUCHSCREEN_MTK_FOCALTECH_FHD
-	bool "Focaltech FHD Touchscreen"
-	depends on I2C
-	help
-	  Say Y here if you have Focaltech touch panel.
-	  If unsure, say N.
-
 config TOUCHSCREEN_MTK_GT9157
 	bool "GT9157 for Mediatek package"
 	help
@@ -184,7 +163,10 @@ source "drivers/input/touchscreen/mediatek/focaltech_touch_k19a/Kconfig"
 # Huaqin add for HQ-147450 by feiwen at 2021/7/23 end
 
 source "drivers/input/touchscreen/mediatek/NT36xxx_HOSTDL_SPI/Kconfig"
+<<<<<<< HEAD
 source "drivers/input/touchscreen/mediatek/focaltech_touch/Kconfig"
+=======
+>>>>>>> 4ccec69
 source "drivers/input/touchscreen/mediatek/xiaomi/Kconfig"
 source "drivers/input/touchscreen/mediatek/NT36672/Kconfig"
 source "drivers/input/touchscreen/mediatek/FT8719P/Kconfig"

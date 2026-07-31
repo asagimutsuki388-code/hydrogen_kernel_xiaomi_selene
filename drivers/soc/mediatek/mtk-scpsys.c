@@ -735,9 +735,16 @@ static void mtk_register_power_domains(struct platform_device *pdev,
 		 * software.  The unused domains will be switched off during
 		 * late_init time.
 		 */
+<<<<<<< HEAD
 		on = !WARN_ON(genpd->power_on(genpd) < 0);
 
 		pm_genpd_init(genpd, NULL, !on);
+=======
+			on = !WARN_ON(genpd->power_on(genpd) < 0);
+
+			pm_genpd_init(genpd, NULL, !on);
+		}
+>>>>>>> 4ccec69
 	}
 
 	/*

@@ -50,15 +50,7 @@
 #include "trusted_mem_api.h"
 #endif
 
-#define ION_DUMP(seq_files, fmt, args...) \
-do {\
-	struct seq_file *file = (struct seq_file *)seq_files;\
-	char *fmat = fmt;\
-	if (file)\
-		seq_printf(file, fmat, ##args);\
-	else\
-		printk(fmat, ##args);\
-} while (0)
+#define ION_DUMP(seq_files, fmt, args...) ((void)0)
 
 struct ion_sec_heap {
 	struct ion_heap heap;
@@ -596,10 +588,6 @@ static int ion_dump_all_share_fds(struct seq_file *s)
 	struct task_struct *p;
 	int res;
 	struct dump_fd_data data;
-
-	/* function is not available, just return */
-	if (ion_drv_file_to_buffer(NULL) == ERR_PTR(-EPERM))
-		return 0;
 
 	ION_DUMP(
 		 s,

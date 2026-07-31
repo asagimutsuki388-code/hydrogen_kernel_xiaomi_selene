@@ -831,7 +831,7 @@ void ovl_get_address(enum DISP_MODULE_ENUM module, unsigned long *add)
 
 void ovl_get_info(enum DISP_MODULE_ENUM module, void *data)
 {
-	int i = 0;
+	unsigned int i = 0;
 	struct OVL_BASIC_STRUCT *pdata = data;
 	unsigned long ovl_base = ovl_base_addr(module);
 	unsigned long layer_off = 0;
@@ -950,8 +950,6 @@ static inline int ovl_switch_to_sec(enum DISP_MODULE_ENUM module, void *handle)
 	/* cmdqRecSecureEnableDAPC(handle, (1LL << cmdq_engine)); */
 	if (ovl_is_sec[ovl_idx] == 0) {
 		DDPSVPMSG("[SVP] switch ovl%d to sec\n", ovl_idx);
-		mmprofile_log_ex(ddp_mmp_get_events()->svp_module[module],
-			MMPROFILE_FLAG_START, 0, 0);
 	}
 	ovl_is_sec[ovl_idx] = 1;
 
@@ -1020,8 +1018,6 @@ int ovl_switch_to_nonsec(enum DISP_MODULE_ENUM module, void *handle)
 
 		cmdqRecDestroy(nonsec_switch_handle);
 		DDPSVPMSG("[SVP] switch ovl%d to nonsec\n", ovl_idx);
-		mmprofile_log_ex(ddp_mmp_get_events()->svp_module[module],
-				 MMPROFILE_FLAG_END, 0, 0);
 	}
 	ovl_is_sec[ovl_idx] = 0;
 
@@ -1278,12 +1274,13 @@ static unsigned long long full_trans_bw_calc(struct sbch *data,
 		pConfig->read_dum_reg[module] = 1;
 	} else if (data->sbch_en_cnt == SBCH_EN_NUM + 1) {
 
-		if (primary_display_is_video_mode())
+		if (primary_display_is_video_mode() && (pgc != NULL))
 			cmdqBackupReadSlot(pgc->ovl_status_info,
 					0, &status);
 		if (!(0x01 & status)) {
-			cmdqBackupReadSlot(pgc->ovl_dummy_info,
-				module, &dum_val);
+			if (pgc != NULL)
+				cmdqBackupReadSlot(pgc->ovl_dummy_info,
+					module, &dum_val);
 			data->full_trans_en =
 				((0x01 << cfg->phy_layer) & dum_val);
 
@@ -1319,8 +1316,6 @@ static void check_bch_reg(enum DISP_MODULE_ENUM module, int *phy_reg,
 		DDPDBG("sbch reg set fail phy:%x--%x, ext:%x--%x\n",
 			phy_value, phy_bit_dbg[module],
 			ext_value, ext_bit_dbg[module]);
-		mmprofile_log_ex(ddp_mmp_get_events()->sbch_set_error,
-			MMPROFILE_FLAG_PULSE, phy_value, phy_bit_dbg[module]);
 		/* disp_aee_print("sbch set error ovl%d\n",module); */
 	}
 
@@ -1334,10 +1329,6 @@ static void check_bch_reg(enum DISP_MODULE_ENUM module, int *phy_reg,
 				ddp_get_module_name(module),
 				phy_bit_dbg[module], phy_value,
 				ext_bit_dbg[module], ext_value);
-
-	if (phy_bit_dbg[module] || phy_value)
-		mmprofile_log_ex(ddp_mmp_get_events()->sbch_set,
-			MMPROFILE_FLAG_PULSE, phy_bit_dbg[module], phy_value);
 
 }
 
@@ -1587,8 +1578,9 @@ static unsigned long long sbch_calc(enum DISP_MODULE_ENUM module,
 		phy_bit[UPDATE] | phy_bit[TRANS_EN] | phy_bit[CNST_EN]);
 	DISP_REG_SET(handle, ovl_base_addr(module) + DISP_REG_OVL_SBCH_EXT,
 		ext_bit[UPDATE] | ext_bit[TRANS_EN] | ext_bit[CNST_EN]);
-	/* clear slot */
-	cmdqBackupWriteSlot(pgc->ovl_dummy_info, module, 0);
+	if (pgc  != NULL)
+		/* clear slot */
+		cmdqBackupWriteSlot(pgc->ovl_dummy_info, module, 0);
 
 	return full_trans_bw;
 }

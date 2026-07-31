@@ -29,19 +29,25 @@
 #include <linux/hqsysfs.h>
 /*BSP.Touch - 2020.11.13 - add for hw_info end*/
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef CONFIG_DRM_MSM
 #include <linux/msm_drm_notify.h>
 #endif
+=======
+>>>>>>> 4ccec69
 #include <linux/notifier.h>
 #include <linux/fb.h>
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 #include <linux/earlysuspend.h>
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 #include "../xiaomi/xiaomi_touch.h"
 #endif
 
+=======
+>>>>>>> 4ccec69
 /* Huaqin add for HQ-131657 by liunianliang at 2021/06/03 start */
 #include "mtk_boot_common.h"
 /* Huaqin add for HQ-131657 by liunianliang at 2021/06/03 end */
@@ -96,11 +102,15 @@ char *MP_UPDATE_FIRMWARE_NAME;
 #endif
 
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 static int nvt_drm_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
 #else
 static int nvt_fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
 #endif
+=======
+static int nvt_fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data);
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 static void nvt_ts_early_suspend(struct early_suspend *h);
 static void nvt_ts_late_resume(struct early_suspend *h);
@@ -829,6 +839,7 @@ void get_tp_info(void)
 {
 	nvt_get_fw_info();
 
+<<<<<<< HEAD
 	if (is_ft_lcm == 0) {
 		sprintf(tp_version_info, "[Vendor]Tianma,[TP-IC]:NT36672,[FW]0x%x,PID=%04X\n", tp_fw_version, ts->nvt_pid);
 	} else if (is_ft_lcm == 1) {
@@ -836,6 +847,9 @@ void get_tp_info(void)
 	} else if (is_ft_lcm == 3) {
 		sprintf(tp_version_info, "[Vendor]Dijing,[TP-IC]:NT36672D,[FW]0x%x,PID=%04X\n", tp_fw_version, ts->nvt_pid);
 	} else if (is_ft_lcm == 4) {
+=======
+	if (is_ft_lcm == 4) {
+>>>>>>> 4ccec69
 		sprintf(tp_version_info, "[Vendor]Tianma,[TP-IC]:NT36672C,[FW]0x%x,PID=%04X\n", tp_fw_version, ts->nvt_pid);
 	} else if (is_ft_lcm == 5) {
 		sprintf(tp_version_info, "[Vendor]Truly,[TP-IC]:NT36672C,[FW]0x%x,PID=%04X\n", tp_fw_version, ts->nvt_pid);
@@ -1399,18 +1413,24 @@ int32_t nvt_check_palm(uint8_t input_id, uint8_t *data)
 		ret = palm_state;
 		if (palm_state == PACKET_PALM_ON) {
 			NVT_LOG("get packet palm on event.\n");
+<<<<<<< HEAD
 			#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 			update_palm_sensor_value(1);
 			#endif
+=======
+>>>>>>> 4ccec69
 			input_report_key(ts->input_dev, 523, 1);
 			input_sync(ts->input_dev);
 			input_report_key(ts->input_dev, 523, 0);
 			input_sync(ts->input_dev);
 		} else if (palm_state == PACKET_PALM_OFF) {
 			NVT_LOG("get packet palm off event.\n");
+<<<<<<< HEAD
 			#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 			update_palm_sensor_value(0);
 			#endif
+=======
+>>>>>>> 4ccec69
 		} else {
 			// should never go here
 			NVT_ERR("invalid palm state %d!\n", palm_state);
@@ -1696,6 +1716,7 @@ static struct tp_common_ops double_tap_ops = {
 #endif
 #endif
 
+<<<<<<< HEAD
 #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 static struct xiaomi_touch_interface xiaomi_touch_interfaces;
 
@@ -1961,6 +1982,8 @@ int nvt_palm_sensor_write(int value)
 }
 #endif
 
+=======
+>>>>>>> 4ccec69
 /*BSP.TP add nvt_irq - 2020.11.11 - Start*/
 static ssize_t nvt_irq_show(
 	struct device *dev, struct device_attribute *attr, char *buf)
@@ -2043,6 +2066,7 @@ int nvt_remove_sysfs(struct spi_device *client)
 int tp_compare_ic(void)
 {
 	NVT_LOG("tp_compare_ic in!!");
+<<<<<<< HEAD
 	if (is_ft_lcm == 0) {
 		BOOT_UPDATE_FIRMWARE_NAME = "nvt_tm_fw.bin";
 		MP_UPDATE_FIRMWARE_NAME = "nvt_tm_mp.bin";
@@ -2059,6 +2083,9 @@ int tp_compare_ic(void)
 		NVT_LOG("match nt36672D_fhdp_dsi_vdo_dijing_j19_lcm_drv");
 		return 0;
 	} else if (is_ft_lcm == 4) {
+=======
+	if (is_ft_lcm == 4) {
+>>>>>>> 4ccec69
 		BOOT_UPDATE_FIRMWARE_NAME = "nt36672c_tm_01_ts_fw.bin";
 		MP_UPDATE_FIRMWARE_NAME = "nt36672c_tm_01_ts_mp.bin";
 		NVT_LOG("match dsi_panel_k19a_36_02_0a_dsc_vdo_lcm_drv");
@@ -2125,6 +2152,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 #endif
 /* Huaqin add for HQ-131657 by liunianliang at 2021/06/03 end */
 
+<<<<<<< HEAD
 	#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 	memset(&xiaomi_touch_interfaces, 0x00, sizeof(struct xiaomi_touch_interface));
 	xiaomi_touch_interfaces.palm_sensor_write = nvt_palm_sensor_write;
@@ -2137,6 +2165,8 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	xiaomitouch_register_modedata(&xiaomi_touch_interfaces);
 	nvt_init_touchmode_data();
 	#endif
+=======
+>>>>>>> 4ccec69
 	ts->client = client;
 	spi_set_drvdata(client, ts);
 	/*BSP.TP add nvt_irq - 2020.11.11 - Start*/
@@ -2401,6 +2431,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	}
 #endif
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 	ts->drm_notif.notifier_call = nvt_drm_notifier_callback;
 	ret = msm_drm_register_client(&ts->drm_notif);
@@ -2409,13 +2440,18 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 		goto err_register_drm_notif_failed;
 	}
 #else
+=======
+>>>>>>> 4ccec69
 	ts->fb_notif.notifier_call = nvt_fb_notifier_callback;
 	ret = fb_register_client(&ts->fb_notif);
 	if (ret) {
 		NVT_ERR("register fb_notifier failed. ret=%d\n", ret);
 		goto err_register_fb_notif_failed;
 	}
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	ts->early_suspend.level = EARLY_SUSPEND_LEVEL_BLANK_SCREEN + 1;
 	ts->early_suspend.suspend = nvt_ts_early_suspend;
@@ -2444,6 +2480,7 @@ static int32_t nvt_ts_probe(struct spi_device *client)
 	return 0;
 
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 	if (msm_drm_unregister_client(&ts->drm_notif))
 		NVT_ERR("Error occurred while unregistering drm_notifier.\n");
@@ -2453,6 +2490,11 @@ err_register_drm_notif_failed:
 		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
 err_register_fb_notif_failed:
 #endif
+=======
+	if (fb_unregister_client(&ts->fb_notif))
+		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
+err_register_fb_notif_failed:
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	unregister_early_suspend(&ts->early_suspend);
 err_register_early_suspend_failed:
@@ -2567,6 +2609,7 @@ static int32_t nvt_ts_remove(struct spi_device *client)
 	nvt_remove_sysfs(client);
 	/*BSP.TP add nvt_irq - 2020.11.11 - End*/
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 	if (msm_drm_unregister_client(&ts->drm_notif))
 		NVT_ERR("Error occurred while unregistering drm_notifier.\n");
@@ -2574,6 +2617,10 @@ static int32_t nvt_ts_remove(struct spi_device *client)
 	if (fb_unregister_client(&ts->fb_notif))
 		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
 #endif
+=======
+	if (fb_unregister_client(&ts->fb_notif))
+		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	unregister_early_suspend(&ts->early_suspend);
 #endif
@@ -2650,6 +2697,7 @@ static void nvt_ts_shutdown(struct spi_device *client)
 	nvt_irq_enable(false);
 
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 	if (msm_drm_unregister_client(&ts->drm_notif))
 		NVT_ERR("Error occurred while unregistering drm_notifier.\n");
@@ -2657,6 +2705,10 @@ static void nvt_ts_shutdown(struct spi_device *client)
 	if (fb_unregister_client(&ts->fb_notif))
 		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
 #endif
+=======
+	if (fb_unregister_client(&ts->fb_notif))
+		NVT_ERR("Error occurred while unregistering fb_notifier.\n");
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	unregister_early_suspend(&ts->early_suspend);
 #endif
@@ -2717,6 +2769,7 @@ static int32_t nvt_ts_suspend(struct device *dev)
 		NVT_LOG("Touch is already suspend\n");
 		return 0;
 	}
+<<<<<<< HEAD
 	#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 	if (ts->palm_sensor_switch) {
 		NVT_LOG("%s: palm sensor on status, switch to off\n", __func__);
@@ -2725,6 +2778,8 @@ static int32_t nvt_ts_suspend(struct device *dev)
 		ts->palm_sensor_switch = false;
 		}
 	#endif
+=======
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 start */
 #if WAKEUP_GESTURE
 	if (nvt_gesture_flag == false)
@@ -2801,6 +2856,7 @@ int32_t nvt_ts_tp_suspend(void)
 		NVT_LOG("Touch is already suspend\n");
 		return 0;
 	}
+<<<<<<< HEAD
 	#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 	if (ts->palm_sensor_switch) {
 		NVT_LOG("%s: palm sensor on status, switch to off\n", __func__);
@@ -2809,6 +2865,8 @@ int32_t nvt_ts_tp_suspend(void)
 		ts->palm_sensor_switch = false;
 		}
 	#endif
+=======
+>>>>>>> 4ccec69
 #if WAKEUP_GESTURE
 	if (nvt_gesture_flag == false)
 		nvt_irq_enable(false);
@@ -2936,6 +2994,7 @@ static int32_t nvt_ts_resume(struct device *dev)
 	/* Huaqin modify for HQ-131628 by shujiawang at 2021/05/10 end */
 
 	mutex_unlock(&ts->lock);
+<<<<<<< HEAD
 	#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 	if (ts->palm_sensor_switch) {
 		NVT_LOG("%s: palm sensor on status, switch to off\n", __func__);
@@ -2944,6 +3003,8 @@ static int32_t nvt_ts_resume(struct device *dev)
 		ts->palm_sensor_switch = false;
 		}
 	#endif
+=======
+>>>>>>> 4ccec69
 	NVT_LOG("end\n");
 
 	return 0;
@@ -3002,6 +3063,7 @@ int32_t nvt_ts_tp_resume(void)
 	/* Huaqin modify for HQ-131628 by shujiawang at 2021/05/10 end */
 
 	mutex_unlock(&ts->lock);
+<<<<<<< HEAD
 #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 	if (ts->palm_sensor_switch) {
 		NVT_LOG("%s: palm sensor on status, switch to off\n", __func__);
@@ -3010,6 +3072,8 @@ int32_t nvt_ts_tp_resume(void)
 		ts->palm_sensor_switch = false;
 		}
 #endif
+=======
+>>>>>>> 4ccec69
 	NVT_LOG("end\n");
 
 	return 0;
@@ -3017,6 +3081,7 @@ int32_t nvt_ts_tp_resume(void)
 EXPORT_SYMBOL(nvt_ts_tp_resume);
 
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 static int nvt_drm_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
 {
@@ -3046,6 +3111,8 @@ static int nvt_drm_notifier_callback(struct notifier_block *self, unsigned long 
 	return 0;
 }
 #else
+=======
+>>>>>>> 4ccec69
 static int nvt_fb_notifier_callback(struct notifier_block *self, unsigned long event, void *data)
 {
 	struct fb_event *evdata = data;
@@ -3091,7 +3158,10 @@ static int nvt_fb_notifier_callback(struct notifier_block *self, unsigned long e
 
 	return 0;
 }
+<<<<<<< HEAD
 #endif
+=======
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 /*******************************************************
 Description:
@@ -3146,6 +3216,7 @@ static struct spi_driver nvt_spi_driver = {
 /* Huaqin modify for HQ-123470 by shujiawang at 2021/03/29 start */
 int __init is_lcm_detect(char *str)
 {
+<<<<<<< HEAD
 	if (!(strcmp(str, "nt36672A_fhdp_dsi_vdo_tianma_j19_lcm_drv"))) {
 		is_ft_lcm = 0;
 		NVT_LOG("Func:%s is_ft 0:%d", __func__, is_ft_lcm);
@@ -3159,6 +3230,9 @@ int __init is_lcm_detect(char *str)
 		is_ft_lcm = 3;
 		NVT_LOG("Func:%s is_ft 3:%d", __func__, is_ft_lcm);
 	}else if (!(strcmp(str, "dsi_panel_k19a_36_02_0a_dsc_vdo_lcm_drv"))) {
+=======
+	if (!(strcmp(str, "dsi_panel_k19a_36_02_0a_dsc_vdo_lcm_drv"))) {
+>>>>>>> 4ccec69
 		is_ft_lcm = 4;
 		NVT_LOG("Func:%s is_ft 4:%d", __func__, is_ft_lcm);
 	}else if (!(strcmp(str, "dsi_panel_k19a_43_02_0b_dsc_vdo_lcm_drv"))) {

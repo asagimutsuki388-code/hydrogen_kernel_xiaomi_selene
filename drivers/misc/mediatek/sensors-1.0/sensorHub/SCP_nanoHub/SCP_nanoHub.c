@@ -537,8 +537,12 @@ static void SCP_sensorHub_sync_time_func(unsigned long data)
 static int SCP_sensorHub_direct_push_work(void *data)
 {
 	for (;;) {
-		wait_event(chre_kthread_wait,
+		int ret = 0;
+
+		ret = wait_event_interruptible(chre_kthread_wait,
 			READ_ONCE(chre_kthread_wait_condition));
+		if (ret != 0)
+			continue;
 		WRITE_ONCE(chre_kthread_wait_condition, false);
 		mark_timestamp(0, WORK_START, ktime_get_boot_ns(), 0);
 		SCP_sensorHub_read_wp_queue();
@@ -1045,9 +1049,6 @@ static int SCP_sensorHub_report_raw_data(struct data_unit_t *data_t)
 	if (raw_enable && data_t->flush_action == DATA_ACTION) {
 		if (data_t->time_stamp > raw_enable_time)
 			err = obj->dispatch_data_cb[sensor_id](data_t, NULL);
-		else
-			pr_info("ac:%d, e:%lld, d:%lld\n", data_t->flush_action,
-				raw_enable_time, data_t->time_stamp);
 	} else if (data_t->flush_action == FLUSH_ACTION) {
 		mutex_lock(&flush_mtx);
 		p_flush_count = &mSensorState[sensor_type].flushCnt;
@@ -1099,9 +1100,6 @@ static int SCP_sensorHub_report_alt_data(struct data_unit_t *data_t)
 	if (alt_enable && data_t->flush_action == DATA_ACTION) {
 		if (data_t->time_stamp > alt_enable_time)
 			err = obj->dispatch_data_cb[alt_id](data_t, NULL);
-		else
-			pr_info("ac:%d, e:%lld, d:%lld\n", data_t->flush_action,
-				alt_enable_time, data_t->time_stamp);
 	} else if (data_t->flush_action == FLUSH_ACTION) {
 		mutex_lock(&flush_mtx);
 		p_flush_count = &mSensorState[alt].flushCnt;
@@ -2210,11 +2208,14 @@ static void restoring_enable_sensorHub_sensor(int handle)
 void sensorHub_power_up_loop(void *data)
 {
 	int handle = 0;
+	int ret = 0;
 	struct SCP_sensorHub_data *obj = obj_data;
 	unsigned long flags = 0;
 
-	wait_event(power_reset_wait,
+	ret = wait_event_interruptible(power_reset_wait,
 		READ_ONCE(scp_system_ready) && READ_ONCE(scp_chre_ready));
+	if (ret != 0)
+		return;
 	spin_lock_irqsave(&scp_state_lock, flags);
 	WRITE_ONCE(scp_chre_ready, false);
 	WRITE_ONCE(scp_system_ready, false);

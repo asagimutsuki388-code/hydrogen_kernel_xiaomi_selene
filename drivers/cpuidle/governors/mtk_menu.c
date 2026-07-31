@@ -10,6 +10,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
  */
+
 #include <linux/kernel.h>
 #include <linux/cpuidle.h>
 #include <linux/pm_qos.h>
@@ -28,7 +29,6 @@
 #include "mtk_menu.h"
 
 static bool screen_on;
-static DEFINE_SPINLOCK(mtk_menu_spin_lock);
 
 bool __attribute__((weak)) system_idle_hint_result(void)
 {
@@ -38,14 +38,6 @@ bool __attribute__((weak)) system_idle_hint_result(void)
 bool __attribute__((weak)) is_all_cpu_idle_criteria(void)
 {
 	return false;
-}
-
-void __attribute__((weak)) mtk_idle_dump_cnt_in_interval(void)
-{
-}
-
-void __attribute__((weak)) mcdi_heart_beat_log_dump(void)
-{
 }
 
 void __attribute__((weak)) mtk_cpuidle_framework_init(void)
@@ -66,22 +58,10 @@ static int mtk_menu_fb_notifier_callback(struct notifier_block *self,
 
 	switch (blank) {
 	case FB_BLANK_UNBLANK:
-
-		spin_lock_irqsave(&mtk_menu_spin_lock, flags);
-
 		screen_on = true;
-
-		spin_unlock_irqrestore(&mtk_menu_spin_lock, flags);
-
 		break;
 	case FB_BLANK_POWERDOWN:
-
-		spin_lock_irqsave(&mtk_menu_spin_lock, flags);
-
 		screen_on = false;
-
-		spin_unlock_irqrestore(&mtk_menu_spin_lock, flags);
-
 		break;
 	default:
 		break;
@@ -98,13 +78,7 @@ static bool is_screen_on(void)
 {
 	bool result = false;
 	unsigned long flags = 0;
-
-	spin_lock_irqsave(&mtk_menu_spin_lock, flags);
-
 	result = screen_on;
-
-	spin_unlock_irqrestore(&mtk_menu_spin_lock, flags);
-
 	return result;
 }
 
@@ -230,8 +204,7 @@ static inline int get_loadavg(unsigned long load)
 	return LOAD_INT(load) * 10 + LOAD_FRAC(load) / 10;
 }
 
-static inline int which_bucket(unsigned int duration,
-			unsigned long nr_iowaiters)
+static inline int which_bucket(unsigned int duration, unsigned long nr_iowaiters)
 {
 	int bucket = 0;
 
@@ -242,7 +215,7 @@ static inline int which_bucket(unsigned int duration,
 	 * E(duration)|iowait
 	 */
 	if (nr_iowaiters)
-		bucket = BUCKETS / 2;
+		bucket = BUCKETS/2;
 
 	if (duration < 10)
 		return bucket;
@@ -264,8 +237,7 @@ static inline int which_bucket(unsigned int duration,
  * to be, the higher this multiplier, and thus the higher
  * the barrier to go to an expensive C state.
  */
-static inline int performance_multiplier(unsigned long nr_iowaiters,
-				unsigned long load)
+static inline int performance_multiplier(unsigned long nr_iowaiters, unsigned long load)
 {
 	int mult = 1;
 
@@ -311,7 +283,6 @@ again:
 	divisor = 0;
 	for (i = 0; i < INTERVALS; i++) {
 		unsigned int value = data->intervals[i];
-
 		if (value <= thresh) {
 			sum += value;
 			divisor++;
@@ -328,10 +299,8 @@ again:
 	variance = 0;
 	for (i = 0; i < INTERVALS; i++) {
 		unsigned int value = data->intervals[i];
-
 		if (value <= thresh) {
 			int64_t diff = (int64_t)value - avg;
-
 			variance += diff * diff;
 		}
 	}
@@ -352,10 +321,9 @@ again:
 	 *
 	 * Use this result only if there is no timer to wake us up sooner.
 	 */
-	if (likely(variance <= U64_MAX / 36)) {
-		if ((((u64)avg * avg > variance * 36)
-			&& (divisor * 4 >= INTERVALS * 3))
-			|| variance <= 400) {
+	if (likely(variance <= U64_MAX/36)) {
+		if ((((u64)avg*avg > variance*36) && (divisor * 4 >= INTERVALS * 3))
+							|| variance <= 400) {
 			return avg;
 		}
 	}
@@ -418,8 +386,7 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 	}
 
 	/* determine the expected residency time, round up */
-	data->next_timer_us =
-		ktime_to_us(tick_nohz_get_sleep_length(&delta_next));
+	data->next_timer_us = ktime_to_us(tick_nohz_get_sleep_length(&delta_next));
 
 	get_iowait_load(&nr_iowaiters, &cpu_load);
 	data->bucket = which_bucket(data->next_timer_us, nr_iowaiters);
@@ -430,10 +397,9 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 	 * operands are 32 bits.
 	 * Make sure to round up for half microseconds.
 	 */
-	data->predicted_us =
-		DIV_ROUND_CLOSEST_ULL((uint64_t)data->next_timer_us *
-			data->correction_factor[data->bucket],
-			RESOLUTION * DECAY);
+	data->predicted_us = DIV_ROUND_CLOSEST_ULL((uint64_t)data->next_timer_us *
+					 data->correction_factor[data->bucket],
+					 RESOLUTION * DECAY);
 
 	/* do NOT use correlation_factor if screen OFF */
 	if (!is_screen_on() && system_idle_hint_result())
@@ -460,12 +426,10 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 
 		s = &drv->states[1];
 		/*
-		 * We want to default to C1 (hlt), not to busy polling
-		 * unless the timer is happening really really soon, or
-		 * C1's exit latency exceeds the user configured limit.
+		 * Default to a physical idle state, not to busy polling, unless
+		 * a timer is going to trigger really really soon.
 		 */
-		polling_threshold =
-			max_t(unsigned int, 20, s->target_residency);
+		polling_threshold = max_t(unsigned int, 20, s->target_residency);
 		if (data->next_timer_us > polling_threshold &&
 		    latency_req > s->exit_latency && !s->disabled &&
 		    !dev->states_usage[1].disable)
@@ -477,21 +441,18 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 		 * If the tick is already stopped, the cost of possible short
 		 * idle duration misprediction is much higher, because the CPU
 		 * may be stuck in a shallow idle state for a long time as a
-		 * result of it.  In that case say we might mispredict and try
-		 * to force the CPU into a state for which we would have stopped
-		 * the tick, unless a timer is going to expire really soon
-		 * anyway.
+		 * result of it.  In that case say we might mispredict and use
+		 * the known time till the closest timer event for the idle
+		 * state selection.
 		 */
 		if (data->predicted_us < TICK_USEC)
-			data->predicted_us = min_t(unsigned int, TICK_USEC,
-						   ktime_to_us(delta_next));
+			data->predicted_us = ktime_to_us(delta_next);
 	} else {
 		/*
 		 * Use the performance multiplier and the user-configurable
 		 * latency_req to determine the maximum exit latency.
 		 */
-		interactivity_req = data->predicted_us /
-				performance_multiplier(nr_iowaiters, cpu_load);
+		interactivity_req = data->predicted_us / performance_multiplier(nr_iowaiters, cpu_load);
 
 #ifdef USE_INTERACTIVITY_REQ
 		if (latency_req > interactivity_req)
@@ -513,8 +474,33 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 			continue;
 		if (idx == -1)
 			idx = i; /* first enabled state */
-		if (s->target_residency > data->predicted_us)
-			break;
+		if (s->target_residency > data->predicted_us) {
+			if (data->predicted_us < TICK_USEC)
+				break;
+
+			if (!tick_nohz_tick_stopped()) {
+				/*
+				 * If the state selected so far is shallow,
+				 * waking up early won't hurt, so retain the
+				 * tick in that case and let the governor run
+				 * again in the next iteration of the loop.
+				 */
+				expected_interval = drv->states[idx].target_residency;
+				break;
+			}
+
+			/*
+			 * If the state selected so far is shallow and this
+			 * state's target residency matches the time till the
+			 * closest timer event, select this one to avoid getting
+			 * stuck in the shallow one for too long.
+			 */
+			if (drv->states[idx].target_residency < TICK_USEC &&
+			    s->target_residency <= ktime_to_us(delta_next))
+				idx = i;
+
+			goto out;
+		}
 		if (s->exit_latency > latency_req) {
 			/*
 			 * If we break out of the loop for latency reasons, use
@@ -535,14 +521,13 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 	 * Don't stop the tick if the selected state is a polling one or if the
 	 * expected idle duration is shorter than the tick period length.
 	 */
-	if ((drv->states[idx].flags & CPUIDLE_FLAG_POLLING) ||
-	    expected_interval < TICK_USEC) {
+	if (((drv->states[idx].flags & CPUIDLE_FLAG_POLLING) ||
+	     expected_interval < TICK_USEC) && !tick_nohz_tick_stopped()) {
 		unsigned int delta_next_us = ktime_to_us(delta_next);
 
 		*stop_tick = false;
 
-		if (!tick_nohz_tick_stopped() && idx > 0 &&
-		    drv->states[idx].target_residency > delta_next_us) {
+		if (idx > 0 && drv->states[idx].target_residency > delta_next_us) {
 			/*
 			 * The tick is not going to be stopped and the target
 			 * residency of the state to be returned is not within
@@ -551,17 +536,17 @@ static int menu_select(struct cpuidle_driver *drv, struct cpuidle_device *dev,
 			 */
 			for (i = idx - 1; i >= 0; i--) {
 				if (drv->states[i].disabled ||
-					dev->states_usage[i].disable)
+				    dev->states_usage[i].disable)
 					continue;
 
 				idx = i;
-				if (drv->states[i].target_residency <=
-					delta_next_us)
+				if (drv->states[i].target_residency <= delta_next_us)
 					break;
 			}
 		}
 	}
 
+out:
 	data->last_state_idx = idx;
 
 	return data->last_state_idx;
@@ -582,9 +567,6 @@ static void menu_reflect(struct cpuidle_device *dev, int index)
 	data->last_state_idx = index;
 	data->needs_update = 1;
 	data->tick_wakeup = tick_nohz_idle_got_tick();
-
-	mtk_idle_dump_cnt_in_interval();
-	mcdi_heart_beat_log_dump();
 }
 
 /**
@@ -688,7 +670,7 @@ static int menu_enable_device(struct cpuidle_driver *drv,
 	 * if the correction factor is 0 (eg first time init or cpu hotplug
 	 * etc), we actually want to start out with a unity factor.
 	 */
-	for (i = 0; i < BUCKETS; i++)
+	for(i = 0; i < BUCKETS; i++)
 		data->correction_factor[i] = RESOLUTION * DECAY;
 
 	return 0;
@@ -731,11 +713,7 @@ static int __init init_menu(void)
 		return r;
 	}
 
-	spin_lock_irqsave(&mtk_menu_spin_lock, flags);
-
 	screen_on = true;
-
-	spin_unlock_irqrestore(&mtk_menu_spin_lock, flags);
 
 	mtk_cpuidle_framework_init();
 

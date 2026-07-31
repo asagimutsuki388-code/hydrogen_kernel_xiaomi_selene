@@ -47,6 +47,7 @@ static HW_INFO(HWID_PMIC_VERSION, pmic_version);
 /*K19A code for WXYFB-1001 by zhangpeng at 2021.3.19 start*/
 static HW_INFO(HWID_AUDIO, audio_PA);
 /*K19A code for WXYFB-1001 by zhangpeng at 2021.3.19 end*/
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
 struct pcba_info pcba[] = {
 	{PCBA_J19_P0_1_CN, "PCBA_J19_P0-1_CN"},
@@ -70,6 +71,9 @@ struct pcba_info pcba[] = {
 	{PCBA_J19P_MP_INDIA, "PCBA_J19P_MP_INDIA"},
 };
 #elif defined(TARGET_PRODUCT_SELENE)
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-147481 by liunianliang at 2021/07/27 start */
 struct pcba_info pcba[] = {
 	{PCBA_K19A_P0_GLOBAL, "PCBA_K19A_P0_GLOBAL"},

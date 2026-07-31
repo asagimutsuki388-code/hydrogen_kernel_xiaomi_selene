@@ -5,6 +5,7 @@
 #if !defined(_TRACE_SCHED_H) || defined(TRACE_HEADER_MULTI_READ)
 #define _TRACE_SCHED_H
 
+#include <linux/kthread.h>
 #include <linux/sched/numa_balancing.h>
 #include <linux/tracepoint.h>
 #include <linux/binfmts.h>
@@ -31,6 +32,7 @@
 #endif
 #define _MT_TASK_STATE_MASK  ((TASK_STATE_MAX - 1) & \
 			      ~(TASK_WAKEKILL | TASK_PARKED | TASK_NOLOAD))
+
 /*
  * Tracepoint for calling kthread_stop, performed to end a kthread:
  */
@@ -73,11 +75,93 @@ TRACE_EVENT(sched_kthread_stop_ret,
 	TP_printk("ret=%d", __entry->ret)
 );
 
+/**
+ * sched_kthread_work_queue_work - called when a work gets queued
+ * @worker:	pointer to the kthread_worker
+ * @work:	pointer to struct kthread_work
+ *
+ * This event occurs when a work is queued immediately or once a
+ * delayed work is actually queued (ie: once the delay has been
+ * reached).
+ */
+TRACE_EVENT(sched_kthread_work_queue_work,
+
+	TP_PROTO(struct kthread_worker *worker,
+		 struct kthread_work *work),
+
+	TP_ARGS(worker, work),
+
+	TP_STRUCT__entry(
+		__field( void *,	work	)
+		__field( void *,	function)
+		__field( void *,	worker)
+	),
+
+	TP_fast_assign(
+		__entry->work		= work;
+		__entry->function	= work->func;
+		__entry->worker		= worker;
+	),
+
+	TP_printk("work struct=%p function=%ps worker=%p",
+		  __entry->work, __entry->function, __entry->worker)
+);
+
+/**
+ * sched_kthread_work_execute_start - called immediately before the work callback
+ * @work:	pointer to struct kthread_work
+ *
+ * Allows to track kthread work execution.
+ */
+TRACE_EVENT(sched_kthread_work_execute_start,
+
+	TP_PROTO(struct kthread_work *work),
+
+	TP_ARGS(work),
+
+	TP_STRUCT__entry(
+		__field( void *,	work	)
+		__field( void *,	function)
+	),
+
+	TP_fast_assign(
+		__entry->work		= work;
+		__entry->function	= work->func;
+	),
+
+	TP_printk("work struct %p: function %ps", __entry->work, __entry->function)
+);
+
+/**
+ * sched_kthread_work_execute_end - called immediately after the work callback
+ * @work:	pointer to struct work_struct
+ * @function:   pointer to worker function
+ *
+ * Allows to track workqueue execution.
+ */
+TRACE_EVENT(sched_kthread_work_execute_end,
+
+	TP_PROTO(struct kthread_work *work, kthread_work_func_t function),
+
+	TP_ARGS(work, function),
+
+	TP_STRUCT__entry(
+		__field( void *,	work	)
+		__field( void *,	function)
+	),
+
+	TP_fast_assign(
+		__entry->work		= work;
+		__entry->function	= function;
+	),
+
+	TP_printk("work struct %p: function %ps", __entry->work, __entry->function)
+);
+
 #ifdef CREATE_TRACE_POINTS
 static inline long __trace_sched_switch_state(bool preempt,
 						struct task_struct *p);
 #endif
-
 /*
  * Tracepoint for waking up a task:
  */
@@ -1425,7 +1509,7 @@ TRACE_EVENT(walt_migration_update_sum,
 
 struct rq;
 
-TRACE_EVENT(schedutil_uclamp_util,
+TRACE_EVENT(uclamp_util_dvfs,
 
 	TP_PROTO(int cpu, unsigned long util),
 
@@ -1452,67 +1536,6 @@ TRACE_EVENT(schedutil_uclamp_util,
 		  __entry->util_max)
 );
 
-TRACE_EVENT(uclamp_cpu_get_id,
-
-	TP_PROTO(struct task_struct *p, struct rq *rq, unsigned int clamp_id),
-
-	TP_ARGS(p, rq, clamp_id),
-
-	TP_STRUCT__entry(
-		__field(int,		cpu)
-		__field(int,	pid)
-		__field(unsigned int,	clamp_id)
-		__field(unsigned int,	task_uclamp_eff)
-		__field(unsigned int,	rq_uclamp)
-	),
-
-	TP_fast_assign(
-		__entry->cpu		= cpu_of(rq);
-		__entry->pid		= p->pid;
-		__entry->clamp_id	= clamp_id;
-		__entry->task_uclamp_eff = p->uclamp[clamp_id].effective.value;
-		__entry->rq_uclamp	= rq->uclamp.value[clamp_id];
-	),
-
-	TP_printk("cpu=%d pid=%d clamp_id=%u task_uclamp_eff=%u rq_uclamp=%u",
-		  __entry->cpu,
-		  __entry->pid,
-		  __entry->clamp_id,
-		  __entry->task_uclamp_eff,
-		  __entry->rq_uclamp)
-);
-
-TRACE_EVENT(uclamp_cpu_put_id,
-
-	TP_PROTO(struct task_struct *p, struct rq *rq, unsigned int clamp_id,
-		unsigned int clamp_value),
-
-	TP_ARGS(p, rq, clamp_id, clamp_value),
-
-	TP_STRUCT__entry(
-		__field(int,		cpu)
-		__field(int,	pid)
-		__field(unsigned int,	clamp_id)
-		__field(unsigned int,	task_uclamp_eff)
-		__field(unsigned int,	rq_uclamp)
-	),
-
-	TP_fast_assign(
-		__entry->cpu		= cpu_of(rq);
-		__entry->pid		= p->pid;
-		__entry->clamp_id	= clamp_id;
-		__entry->task_uclamp_eff	= clamp_value;
-		__entry->rq_uclamp	= rq->uclamp.value[clamp_id];
-	),
-
-	TP_printk("cpu=%d pid=%d clamp_id=%u task_uclamp_eff=%u rq_uclamp=%u",
-		  __entry->cpu,
-		  __entry->pid,
-		  __entry->clamp_id,
-		  __entry->task_uclamp_eff,
-		  __entry->rq_uclamp)
-);
-
 TRACE_EVENT_CONDITION(uclamp_util_se,
 
 	TP_PROTO(bool is_task, struct task_struct *p, struct rq *rq),
@@ -1525,33 +1548,26 @@ TRACE_EVENT_CONDITION(uclamp_util_se,
 		__field(pid_t,	pid)
 		__array(char,	comm,   TASK_COMM_LEN)
 		__field(int,	cpu)
-		__field(unsigned int,	active)
 		__field(unsigned long,	util_avg)
 		__field(unsigned long,	uclamp_avg)
 		__field(unsigned long,	uclamp_min)
 		__field(unsigned long,	uclamp_max)
-		__field(unsigned long,	uclamp_min_eff)
-		__field(unsigned long,	uclamp_max_eff)
 	),
 
 	TP_fast_assign(
 		__entry->pid            = p->pid;
 		memcpy(__entry->comm, p->comm, TASK_COMM_LEN);
 		__entry->cpu            = rq->cpu;
-		__entry->active         = p->uclamp[UCLAMP_MIN].active;
 		__entry->util_avg       = p->se.avg.util_avg;
 		__entry->uclamp_avg     = uclamp_util(rq, p->se.avg.util_avg);
-		__entry->uclamp_min = p->uclamp[UCLAMP_MIN].value;
-		__entry->uclamp_max = p->uclamp[UCLAMP_MAX].value;
-		__entry->uclamp_min_eff = p->uclamp[UCLAMP_MIN].effective.value;
-		__entry->uclamp_max_eff = p->uclamp[UCLAMP_MAX].effective.value;
+		__entry->uclamp_min     = rq->uclamp.value[UCLAMP_MIN];
+		__entry->uclamp_max     = rq->uclamp.value[UCLAMP_MAX];
 		),
 
-	TP_printk("pid=%d comm=%s cpu=%d active=%u util_avg=%lu uclamp_avg=%lu uclamp_min=%lu uclamp_max=%lu uclamp_min_eff=%lu uclamp_max_eff=%lu",
+	TP_printk("pid=%d comm=%s cpu=%d util_avg=%lu uclamp_avg=%lu uclamp_min=%lu uclamp_max=%lu",
 		  __entry->pid, __entry->comm, __entry->cpu,
-		  __entry->active, __entry->util_avg, __entry->uclamp_avg,
-		  __entry->uclamp_min, __entry->uclamp_max,
-		  __entry->uclamp_min_eff, __entry->uclamp_max_eff)
+		  __entry->util_avg, __entry->uclamp_avg,
+		  __entry->uclamp_min, __entry->uclamp_max)
 );
 
 TRACE_EVENT_CONDITION(uclamp_util_cfs,

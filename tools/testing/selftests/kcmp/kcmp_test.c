@@ -89,7 +89,10 @@ int main(int argc, char **argv)
 		int ret;
 
 		ksft_print_header();
+<<<<<<< HEAD
 		ksft_set_plan(3);
+=======
+>>>>>>> 4ccec69
 
 		fd2 = open(kpath, O_RDWR);
 		if (fd2 < 0) {

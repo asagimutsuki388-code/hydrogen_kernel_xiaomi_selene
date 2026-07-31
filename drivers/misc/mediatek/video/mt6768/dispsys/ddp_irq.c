@@ -45,7 +45,6 @@
 
 /* IRQ log print kthread */
 static struct task_struct *disp_irq_log_task;
-static wait_queue_head_t disp_irq_log_wq;
 static int disp_irq_log_module;
 static int disp_irq_rdma_underflow;
 static int irq_init;
@@ -223,8 +222,11 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 			ddp_get_module_name(module), reg_val);
 
 		if (reg_val & (1 << 2)) {
+<<<<<<< HEAD
 			mmprofile_log_ex(ddp_mmp_get_events()->DSI_IRQ[index],
 				MMPROFILE_FLAG_PULSE, reg_val, 0);
+=======
+>>>>>>> 4ccec69
 			//DDPMSG("DSI TE\n");
 		}
 
@@ -300,13 +302,6 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 
 		DISP_CPU_REG_SET(
 			DISP_REG_OVL_INTSTA + ovl_base_addr(module), ~reg_val);
-		mmprofile_log_ex(ddp_mmp_get_events()->OVL_IRQ[index],
-			MMPROFILE_FLAG_PULSE, reg_val, 0);
-		if (reg_val & 0x1e0)
-			mmprofile_log_ex(
-				ddp_mmp_get_events()->ddp_abnormal_irq,
-				MMPROFILE_FLAG_PULSE,
-				(index << 16) | reg_val, module);
 
 	} else if (irq == ddp_get_module_irq(DISP_MODULE_WDMA0)) {
 		index = 0;
@@ -328,15 +323,6 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 		}
 		/* clear intr */
 		DISP_CPU_REG_SET(DISP_REG_WDMA_INTSTA, ~reg_val);
-		mmprofile_log_ex(ddp_mmp_get_events()->WDMA_IRQ[index],
-			MMPROFILE_FLAG_PULSE, reg_val,
-			DISP_REG_GET(DISP_REG_WDMA_CLIP_SIZE));
-		if (reg_val & 0x2)
-			mmprofile_log_ex(ddp_mmp_get_events()->ddp_abnormal_irq,
-				MMPROFILE_FLAG_PULSE,
-				(cnt_wdma_underflow[index] << 24) |
-				(index << 16) | reg_val,
-				module);
 	} else if (irq == ddp_get_module_irq(DISP_MODULE_RDMA0)) {
 
 		if (ddp_get_module_irq(DISP_MODULE_RDMA0) == irq) {
@@ -357,29 +343,22 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 			DDPIRQ("IRQ: RDMA%d reg update done!\n", index);
 
 		if (reg_val & (1 << 2)) {
-			mmprofile_log_ex(
-				ddp_mmp_get_events()->SCREEN_UPDATE[index],
-				MMPROFILE_FLAG_END, reg_val,
-				DISP_REG_GET(DISPSYS_RDMA0_BASE + 0x4));
 			rdma_end_time[index] = sched_clock();
 			DDPIRQ("IRQ: RDMA%d frame done!\n", index);
 			rdma_done_irq_cnt[index]++;
 		}
 		if (reg_val & (1 << 1)) {
-			mmprofile_log_ex(
-				ddp_mmp_get_events()->SCREEN_UPDATE[index],
-				MMPROFILE_FLAG_START, reg_val,
-				DISP_REG_GET(DISPSYS_RDMA0_BASE + 0x4));
 			rdma_start_time[index] = sched_clock();
 			DDPIRQ("IRQ: RDMA%d frame start!\n", index);
 			rdma_start_irq_cnt[index]++;
+<<<<<<< HEAD
 			primary_display_wakeup_pf_thread();
+=======
+			if (!primary_display_is_video_mode())
+				primary_display_wakeup_pf_thread();
+>>>>>>> 4ccec69
 		}
 		if (reg_val & (1 << 3)) {
-			mmprofile_log_ex(
-				ddp_mmp_get_events()->SCREEN_UPDATE[index],
-				MMPROFILE_FLAG_PULSE, reg_val,
-				DISP_REG_GET(DISPSYS_RDMA0_BASE + 0x4));
 
 			DDPERR("IRQ: RDMA%d abnormal! cnt=%d\n",
 				index, cnt_rdma_abnormal[index]++);
@@ -388,9 +367,6 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 		}
 		if (reg_val & (1 << 4)) {
 
-			mmprofile_log_ex(
-				ddp_mmp_get_events()->SCREEN_UPDATE[index],
-				MMPROFILE_FLAG_PULSE, reg_val, 1);
 
 			cnt_rdma_underflow[index]++;
 			DDPERR(
@@ -415,13 +391,6 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 		/* clear intr */
 		DISP_CPU_REG_SET(DISP_REG_RDMA_INT_STATUS +
 			index * DISP_RDMA_INDEX_OFFSET, ~reg_val);
-		mmprofile_log_ex(ddp_mmp_get_events()->RDMA_IRQ[index],
-			MMPROFILE_FLAG_PULSE, reg_val, 0);
-		if (reg_val & 0x18)
-			mmprofile_log_ex(ddp_mmp_get_events()->ddp_abnormal_irq,
-				MMPROFILE_FLAG_PULSE,
-				(rdma_underflow_irq_cnt[index] << 24) |
-				(index << 16) | reg_val, module);
 
 	} else if (irq == ddp_get_module_irq(DISP_MODULE_MUTEX)) {
 		/* mutex0: perimary disp */
@@ -440,15 +409,9 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 		for (m_id = 0; m_id < DISP_MUTEX_DDP_COUNT; m_id++) {
 			if (reg_val & (0x1 << m_id)) {
 				DDPIRQ("IRQ: mutex%d sof!\n", m_id);
-				mmprofile_log_ex(
-					ddp_mmp_get_events()->MUTEX_IRQ[m_id],
-					MMPROFILE_FLAG_PULSE, reg_val, 0);
 			}
 			if (reg_val & (0x1 << (m_id + DISP_MUTEX_TOTAL))) {
 				DDPIRQ("IRQ: mutex%d eof!\n", m_id);
-				mmprofile_log_ex(
-					ddp_mmp_get_events()->MUTEX_IRQ[m_id],
-					MMPROFILE_FLAG_PULSE, reg_val, 1);
 			}
 		}
 		DISP_CPU_REG_SET(DISP_REG_CONFIG_MUTEX_INTSTA, ~reg_val);
@@ -482,11 +445,6 @@ irqreturn_t disp_irq_handler(int irq, void *dev_id)
 
 	disp_invoke_irq_callbacks(module, reg_val);
 
-	if (disp_irq_log_module != 0)
-		wake_up_interruptible(&disp_irq_log_wq);
-
-	mmprofile_log_ex(ddp_mmp_get_events()->DDP_IRQ,
-		MMPROFILE_FLAG_PULSE, module, reg_val);
 	return IRQ_HANDLED;
 }
 
@@ -536,28 +494,6 @@ static void disp_irq_rdma_underflow_aee_trigger(void)
 
 }
 
-static int disp_irq_log_kthread_func(void *data)
-{
-	unsigned int i = 0;
-
-	while (1) {
-		wait_event_interruptible(disp_irq_log_wq, disp_irq_log_module);
-		DDPMSG("%s dump intr register: disp_irq_log_module=%d\n",
-		       __func__, disp_irq_log_module);
-		for (i = 0; i < DISP_MODULE_NUM; i++) {
-			if ((disp_irq_log_module & (1 << i)) != 0)
-				ddp_dump_reg(i);
-
-		}
-		disp_irq_log_module = 0;
-
-		/* rdma underflow trigger aee */
-		disp_irq_rdma_underflow_aee_trigger();
-	}
-	return 0;
-}
-
-
 int disp_init_irq(void)
 {
 	if (irq_init)
@@ -565,13 +501,6 @@ int disp_init_irq(void)
 
 	irq_init = 1;
 	DDPMSG("disp_init_irq\n");
-
-	/* create irq log thread */
-	init_waitqueue_head(&disp_irq_log_wq);
-	disp_irq_log_task = kthread_create(disp_irq_log_kthread_func,
-		NULL, "ddp_irq_log_kthread");
-	if (IS_ERR(disp_irq_log_task))
-		DDPERR(" can not create disp_irq_log_task kthread\n");
 
 	/* wake_up_process(disp_irq_log_task); */
 	return 0;

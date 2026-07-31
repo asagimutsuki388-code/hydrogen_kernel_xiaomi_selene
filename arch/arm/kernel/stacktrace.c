@@ -63,6 +63,15 @@ int notrace unwind_frame(struct stackframe *frame)
 	frame->sp = READ_ONCE_NOCHECK(*(unsigned long *)(fp - 8));
 	frame->pc = READ_ONCE_NOCHECK(*(unsigned long *)(fp - 4));
 #endif
+<<<<<<< HEAD
+=======
+
+	if (ALIGN(frame->fp, THREAD_SIZE) != ALIGN(fp, THREAD_SIZE))
+		return -EINVAL;
+
+	if (ALIGN(frame->sp, THREAD_SIZE) != ALIGN(low, THREAD_SIZE))
+		return -EINVAL;
+>>>>>>> 4ccec69
 
 	return 0;
 }

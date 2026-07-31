@@ -793,7 +793,10 @@ static void __exit fpsgo_exit(void)
 #elif defined(CONFIG_MTK_HIGH_FRAME_RATE)
 	disp_unregister_fps_chg_callback(dfrc_fps_limit_cb);
 #endif
+<<<<<<< HEAD
 	
+=======
+>>>>>>> 4ccec69
 	fbt_cpu_exit();
 	mtk_fstb_exit();
 	fpsgo_composer_exit();

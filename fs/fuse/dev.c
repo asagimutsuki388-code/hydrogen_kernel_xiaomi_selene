@@ -1670,9 +1670,11 @@ static int fuse_notify_store(struct fuse_conn *fc, unsigned int size,
 
 		this_num = min_t(unsigned, num, PAGE_SIZE - offset);
 		err = fuse_copy_page(cs, &page, offset, this_num, 0);
-		if (!err && offset == 0 &&
-		    (this_num == PAGE_SIZE || file_size == end))
+		if (!PageUptodate(page) && !err && offset == 0 &&
+		    (this_num == PAGE_SIZE || file_size == end)) {
+			zero_user_segment(page, this_num, PAGE_SIZE);
 			SetPageUptodate(page);
+		}
 		unlock_page(page);
 		put_page(page);
 
@@ -2288,25 +2290,42 @@ static long fuse_dev_ioctl(struct file *file, unsigned int cmd,
 {
 	int res;
 	int oldfd;
+<<<<<<< HEAD
 	struct fuse_dev *fud;
 	struct fuse_passthrough_out pto;
+=======
+	struct fuse_dev *fud = NULL;
+>>>>>>> 4ccec69
 
 	switch (cmd) {
 	case FUSE_DEV_IOC_CLONE:
 		res = -EFAULT;
+<<<<<<< HEAD
 		if (!get_user(oldfd, (__u32 __user *)arg)){
 			struct file *old = fget(oldfd);
 			res = -EINVAL;
 			if (old) {
 				fud = NULL;
 
+=======
+		if (!get_user(oldfd, (__u32 __user *)arg)) {
+			struct file *old = fget(oldfd);
+
+			res = -EINVAL;
+			if (old) {
+>>>>>>> 4ccec69
 				/*
 				 * Check against file->f_op because CUSE
 				 * uses the same ioctl handler.
 				 */
 				if (old->f_op == file->f_op &&
+<<<<<<< HEAD
 				   			old->f_cred->user_ns ==
 								file->f_cred->user_ns)
+=======
+				    old->f_cred->user_ns ==
+					    file->f_cred->user_ns)
+>>>>>>> 4ccec69
 					fud = fuse_get_dev(old);
 
 				if (fud) {
@@ -2320,6 +2339,7 @@ static long fuse_dev_ioctl(struct file *file, unsigned int cmd,
 		break;
 	case FUSE_DEV_IOC_PASSTHROUGH_OPEN:
 		res = -EFAULT;
+<<<<<<< HEAD
 		if (!copy_from_user(&pto,
 					(struct fuse_passthrough_out __user *)arg,
 					sizeof(pto))) {
@@ -2327,6 +2347,13 @@ static long fuse_dev_ioctl(struct file *file, unsigned int cmd,
 			fud = fuse_get_dev(file);
 			if (fud)
 				res = fuse_passthrough_open(fud, &pto);
+=======
+		if (!get_user(oldfd, (__u32 __user *)arg)) {
+			res = -EINVAL;
+			fud = fuse_get_dev(file);
+			if (fud)
+				res = fuse_passthrough_open(fud, oldfd);
+>>>>>>> 4ccec69
 		}
 		break;
 	default:

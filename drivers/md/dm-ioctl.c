@@ -1039,8 +1039,26 @@ static int do_resume(struct dm_ioctl *param)
 			suspend_flags &= ~DM_SUSPEND_LOCKFS_FLAG;
 		if (param->flags & DM_NOFLUSH_FLAG)
 			suspend_flags |= DM_SUSPEND_NOFLUSH_FLAG;
-		if (!dm_suspended_md(md))
-			dm_suspend(md, suspend_flags);
+		if (!dm_suspended_md(md)) {
+			r = dm_suspend(md, suspend_flags);
+			if (r) {
+				down_write(&_hash_lock);
+				hc = dm_get_mdptr(md);
+				if (hc && !hc->new_map) {
+					hc->new_map = new_map;
+					new_map = NULL;
+				} else {
+					r = -ENXIO;
+				}
+				up_write(&_hash_lock);
+				if (new_map) {
+					dm_sync_table(md);
+					dm_table_destroy(new_map);
+				}
+				dm_put(md);
+				return r;
+			}
+		}
 
 		old_map = dm_swap_table(md, new_map);
 		if (IS_ERR(old_map)) {
@@ -1733,7 +1751,8 @@ static int copy_params(struct dm_ioctl __user *user, struct dm_ioctl *param_kern
 	if (copy_from_user(param_kernel, user, minimum_data_size))
 		return -EFAULT;
 
-	if (param_kernel->data_size < minimum_data_size)
+	if (unlikely(param_kernel->data_size < minimum_data_size) ||
+	    unlikely(param_kernel->data_size > DM_MAX_TARGETS * DM_MAX_TARGET_PARAMS))
 		return -EINVAL;
 
 	secure_data = param_kernel->flags & DM_SECURE_DATA_FLAG;
@@ -2019,5 +2038,108 @@ int dm_copy_name_and_uuid(struct mapped_device *md, char *name, char *uuid)
 out:
 	mutex_unlock(&dm_hash_cells_mutex);
 
+	return r;
+}
+
+
+/**
+ * dm_early_create - create a mapped device in early boot.
+ *
+ * @dmi: Contains main information of the device mapping to be created.
+ * @spec_array: array of pointers to struct dm_target_spec. Describes the
+ * mapping table of the device.
+ * @target_params_array: array of strings with the parameters to a specific
+ * target.
+ *
+ * Instead of having the struct dm_target_spec and the parameters for every
+ * target embedded at the end of struct dm_ioctl (as performed in a normal
+ * ioctl), pass them as arguments, so the caller doesn't need to serialize them.
+ * The size of the spec_array and target_params_array is given by
+ * @dmi->target_count.
+ * This function is supposed to be called in early boot, so locking mechanisms
+ * to protect against concurrent loads are not required.
+ */
+int __init dm_early_create(struct dm_ioctl *dmi,
+			   struct dm_target_spec **spec_array,
+			   char **target_params_array)
+{
+	int r, m = DM_ANY_MINOR;
+	struct dm_table *t, *old_map;
+	struct mapped_device *md;
+	unsigned int i;
+
+	if (!dmi->target_count)
+		return -EINVAL;
+
+	r = check_name(dmi->name);
+	if (r)
+		return r;
+
+	if (dmi->flags & DM_PERSISTENT_DEV_FLAG)
+		m = MINOR(huge_decode_dev(dmi->dev));
+
+	/* alloc dm device */
+	r = dm_create(m, &md);
+	if (r)
+		return r;
+
+	/* hash insert */
+	r = dm_hash_insert(dmi->name, *dmi->uuid ? dmi->uuid : NULL, md);
+	if (r)
+		goto err_destroy_dm;
+
+	/* alloc table */
+	r = dm_table_create(&t, get_mode(dmi), dmi->target_count, md);
+	if (r)
+		goto err_destroy_dm;
+
+	/* add targets */
+	for (i = 0; i < dmi->target_count; i++) {
+		r = dm_table_add_target(t, spec_array[i]->target_type,
+					(sector_t) spec_array[i]->sector_start,
+					(sector_t) spec_array[i]->length,
+					target_params_array[i]);
+		if (r) {
+			DMWARN("error adding target to table");
+			goto err_destroy_table;
+		}
+	}
+
+	/* finish table */
+	r = dm_table_complete(t);
+	if (r)
+		goto err_destroy_table;
+
+	md->type = dm_table_get_type(t);
+	/* setup md->queue to reflect md's type (may block) */
+	r = dm_setup_md_queue(md, t);
+	if (r) {
+		DMWARN("unable to set up device queue for new table.");
+		goto err_destroy_table;
+	}
+
+	/* Set new map */
+	dm_suspend(md, 0);
+	old_map = dm_swap_table(md, t);
+	if (IS_ERR(old_map)) {
+		r = PTR_ERR(old_map);
+		goto err_destroy_table;
+	}
+	set_disk_ro(dm_disk(md), !!(dmi->flags & DM_READONLY_FLAG));
+
+	/* resume device */
+	r = dm_resume(md);
+	if (r)
+		goto err_destroy_table;
+
+	DMINFO("%s (%s) is ready", md->disk->disk_name, dmi->name);
+	dm_put(md);
+	return 0;
+
+err_destroy_table:
+	dm_table_destroy(t);
+err_destroy_dm:
+	dm_put(md);
+	dm_destroy(md);
 	return r;
 }

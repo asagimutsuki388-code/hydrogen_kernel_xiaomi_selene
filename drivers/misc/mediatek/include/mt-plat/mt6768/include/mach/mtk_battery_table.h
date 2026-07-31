@@ -113,11 +113,33 @@ int g_FG_PSEUDO1[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	{ 13, 14, 15, 16, 15, 16} /*T9*/
 };
 
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
 int g_FG_PSEUDO100[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	/*bat1,   bat2,   bat3,    bat4*/
 	{ 99, 99, 99, 99},/*T0*/
 	{ 99, 96, 99, 99},/*T1*/
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+int g_FG_PSEUDO100[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
+	/*bat1,   bat2,   bat3,    bat4*/
+	{ 99, 99, 99, 99 , 99, 99},/*T0*/
+	{ 99, 96, 99, 99 , 99, 99},/*T1*/
+	{ 90, 80, 80, 80 , 80, 80},/*T2*/
+	{ 90, 80, 80, 80 , 80, 80},/*T3*/
+	{ 100, 100, 100, 100, 100, 100},/*T4*/
+	{ 100, 100, 100, 100, 100, 100},/*T5*/
+	{ 100, 100, 100, 100, 100, 100},/*T6*/
+	{ 100, 100, 100, 100, 100, 100},/*T7*/
+	{ 100, 100, 100, 100, 100, 100},/*T8*/
+	{ 100, 100, 100, 100, 100, 100} /*T9*/
+};
+#else
+int g_FG_PSEUDO100[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
+	/*bat1,   bat2,   bat3,    bat4*/
+	{ 99, 99, 99, 99},/*T0*/
+	{ 99, 99, 99, 99},/*T1*/
+>>>>>>> 4ccec69
 	{ 90, 80, 80, 80},/*T2*/
 	{ 90, 80, 80, 80},/*T3*/
 	{ 100, 100, 100, 100},/*T4*/
@@ -127,6 +149,7 @@ int g_FG_PSEUDO100[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	{ 100, 100, 100, 100},/*T8*/
 	{ 100, 100, 100, 100} /*T9*/
 };
+<<<<<<< HEAD
 #elif defined(TARGET_PRODUCT_SELENE)
 int g_FG_PSEUDO100[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	/*bat1,   bat2,   bat3,    bat4*/
@@ -155,6 +178,8 @@ int g_FG_PSEUDO100[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	{ 100, 100, 100, 100},/*T8*/
 	{ 100, 100, 100, 100} /*T9*/
 };
+=======
+>>>>>>> 4ccec69
 #endif
 
 /* shutdown_hl_zcv */
@@ -206,15 +231,41 @@ int g_PON_SYS_IBOOT[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	{5000, 5000, 5000, 5000, 5000, 5000} /*T9*/
 };
 
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+/*K19A HQHW-951 K19A for FGADC by langjunjun at 2021/6/22 start*/
+/* Q_MAX_SYS_VOLTAGE by temp ,control by MULTI_TEMP_GAUGE0=1, */
+int g_QMAX_SYS_VOL[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
+	/*bat1,   bat2,   bat3,    bat4*/
+	{33500, 33500, 33500, 33500, 33500, 33500},/*T0*/
+	{34500, 34500, 34500, 34500, 34500, 34500},/*T1*/
+	{35500, 35500, 35500, 35500, 35500, 35500},/*T2*/
+	{34500, 34500, 34500, 34500, 34500, 34500},/*T3*/
+	{34500, 34500, 34500, 34500, 34500, 34500},/*T4*/
+	{34000, 34000, 34000, 34000, 34000, 34000},/*T5*/
+	{34000, 34000, 34000, 34000, 34000, 34000},/*T6*/
+	{34000, 34000, 34000, 34000, 34000, 34000},/*T7*/
+	{34000, 34000, 34000, 34000, 34000, 34000},/*T8*/
+	{34000, 34000, 34000, 34000, 34000, 34000} /*T9*/
+};
+/*K19A HQHW-951 K19A for FGADC by langjunjun at 2021/6/22 end*/
+#else
+>>>>>>> 4ccec69
 
 /* Q_MAX_SYS_VOLTAGE by temp ,control by MULTI_TEMP_GAUGE0=1, */
 int g_QMAX_SYS_VOL[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	/*bat1,   bat2,   bat3,    bat4*/
 	{34000, 34000, 34000, 34000, 34000, 34000},/*T0*/
 	{34000, 34000, 34000, 34000, 34000, 34000},/*T1*/
+<<<<<<< HEAD
 	{34500, 35000, 34300, 34300, 34300, 34300},/*T2*/
 	{33700, 34300, 34100, 34100, 34100, 34100},/*T3*/
+=======
+	{34300, 34000, 34300, 34300, 34300, 34300},/*T2*/
+	{34100, 33800, 34100, 34100, 34100, 34100},/*T3*/
+>>>>>>> 4ccec69
 	{34300, 33800, 34300, 34300, 34300, 34300},/*T4*/
 	{34000, 34000, 34000, 34000, 34000, 34000},/*T5*/
 	{34000, 34000, 34000, 34000, 34000, 34000},/*T6*/
@@ -222,6 +273,7 @@ int g_QMAX_SYS_VOL[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	{34000, 34000, 34000, 34000, 34000, 34000},/*T8*/
 	{34000, 34000, 34000, 34000, 34000, 34000} /*T9*/
 };
+<<<<<<< HEAD
 #elif defined(TARGET_PRODUCT_SELENE)
 /*K19A HQHW-951 K19A for FGADC by langjunjun at 2021/6/22 start*/
 /* Q_MAX_SYS_VOLTAGE by temp ,control by MULTI_TEMP_GAUGE0=1, */
@@ -255,6 +307,8 @@ int g_QMAX_SYS_VOL[MAX_TABLE][TOTAL_BATTERY_NUMBER] = {
 	{34000, 34000, 34000, 34000, 34000, 34000},/*T8*/
 	{34000, 34000, 34000, 34000, 34000, 34000} /*T9*/
 };
+=======
+>>>>>>> 4ccec69
 #endif
 
 #define TEMPERATURE_TB0	255
@@ -295,6 +349,7 @@ int g_temperature[MAX_TABLE] = {
 #define BIF_NTC_R 16000
 
 #if (BAT_NTC_100 == 1)
+<<<<<<< HEAD
 #if defined(TARGET_PRODUCT_LANCELOT) || defined(TARGET_PRODUCT_SHIVA)
 struct FUELGAUGE_TEMPERATURE Fg_Temperature_Table[27] = {
 		{-40, 4251000},
@@ -326,6 +381,9 @@ struct FUELGAUGE_TEMPERATURE Fg_Temperature_Table[27] = {
 		{90, 7500}
 };
 #elif defined(TARGET_PRODUCT_SELENE)
+=======
+#if defined(TARGET_PRODUCT_SELENE)
+>>>>>>> 4ccec69
 struct FUELGAUGE_TEMPERATURE Fg_Temperature_Table[27] = {
 		{-40, 4251000},
 		{-35, 3005000},

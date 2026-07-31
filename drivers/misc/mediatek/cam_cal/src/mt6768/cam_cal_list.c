@@ -33,12 +33,15 @@ extern unsigned int gc02m1_sunny_read_otp_info(struct i2c_client *client,
 extern unsigned int gc02m1_read_otp_info(struct i2c_client *client, unsigned int addr, unsigned char *data, unsigned int size);
 extern unsigned int ov02b1b_read_otp_info(struct i2c_client *client, unsigned int addr, unsigned char *data, unsigned int size);
 #endif
+<<<<<<< HEAD
 
 #ifdef CONFIG_TARGET_PRODUCT_SHIVACOMMON
 #if defined(OV8856_QTECH_FRONT_MIPI_RAW)
 extern unsigned int ov8856_qtech_front_read_otp_info(struct i2c_client *client, unsigned int addr, unsigned char *data, unsigned int size);
 #endif
 #endif
+=======
+>>>>>>> 4ccec69
 
 struct stCAM_CAL_LIST_STRUCT g_camCalList[] = {
 	/*Below is commom sensor */
@@ -70,6 +73,7 @@ struct stCAM_CAL_LIST_STRUCT g_camCalList[] = {
 	{IMX355_SUNNY_ULTRA_SENSOR_CN_ID, 0xA0, Common_read_region},
 	{IMX355_AAC_ULTRA_SENSOR_CN_ID, 0xA0, Common_read_region},
 #endif
+<<<<<<< HEAD
 #ifdef CONFIG_TARGET_PRODUCT_SHIVACOMMON
 	{OV13B10_OFILM_SENSOR_ID, 0xA2, Common_read_region},
 	{OV13B10_QTECH_SENSOR_ID, 0xA2, Common_read_region},
@@ -83,6 +87,8 @@ struct stCAM_CAL_LIST_STRUCT g_camCalList[] = {
 	{GC5035_OFILM_SENSOR_ID, 0xA4, Common_read_region},
 	{GC5035_QTECH_SENSOR_ID, 0xA4, Common_read_region},
 #endif
+=======
+>>>>>>> 4ccec69
 	{IMX519_SENSOR_ID, 0xA0, Common_read_region},
 	{S5K2T7SP_SENSOR_ID, 0xA4, Common_read_region},
 	{IMX338_SENSOR_ID, 0xA0, Common_read_region},

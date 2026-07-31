@@ -75,6 +75,7 @@ typedef struct HQ_IMGSENSOR_HQ_REGISTER_INFO {
  * should to be modified before factory P1 node. Need to add
  * < sunny_8856_i > < ofilm_8856_i >
  ************************************************************************/
+<<<<<<< HEAD
 #if defined(MERLIN_MSM_CAMERA_HW_INFO)
 #define MAX_SENSOR_NAME_SIZE 30
 #define MAX_HW_REG_NAME_SIZE 20
@@ -110,6 +111,9 @@ HQ_IMGSENSOR_HQ_REGISTER_INFO cam_str_buff[MAX_IMGSENSOR_NUM][MAX_VENDOR_COUNT] 
 };
 
 #elif defined(LANCELOT_MSM_CAMERA_HW_INFO) || defined(GALAHAD_MSM_CAMERA_HW_INFO) || defined(SELENE_MSM_CAMERA_HW_INFO)
+=======
+#if defined(SELENE_MSM_CAMERA_HW_INFO)
+>>>>>>> 4ccec69
 #define MAX_SENSOR_NAME_SIZE 30
 #define MAX_HW_REG_NAME_SIZE 20
 #undef  MAX_VENDOR_COUNT
@@ -138,6 +142,7 @@ HQ_IMGSENSOR_HQ_REGISTER_INFO cam_str_buff[MAX_IMGSENSOR_NUM][MAX_VENDOR_COUNT] 
 		{"gc5035_qtech_mipi_raw", "qtech_gc5035_ii", HWID_MAIN_CAM_3},
 	}
 };
+<<<<<<< HEAD
 
 #elif defined(SHIVA_MSM_CAMERA_HW_INFO) || defined(SHIVA_MSM_CAMERA_HW_INFO)
 #define MAX_SENSOR_NAME_SIZE 30
@@ -169,6 +174,8 @@ HQ_IMGSENSOR_HQ_REGISTER_INFO cam_str_buff[MAX_IMGSENSOR_NUM][MAX_VENDOR_COUNT] 
 	}
 };
 
+=======
+>>>>>>> 4ccec69
 #endif
 
 /************************************************************************

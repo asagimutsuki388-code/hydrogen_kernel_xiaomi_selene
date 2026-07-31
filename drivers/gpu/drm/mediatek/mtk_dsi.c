@@ -1552,6 +1552,9 @@ static void mtk_dsi_poweroff(struct mtk_dsi *dsi)
 
 	mtk_dsi_disable(dsi);
 
+	/* set the lane number as 0 to pull down mipi */
+	writel(0, dsi->regs + DSI_TXRX_CTRL);
+
 	clk_disable_unprepare(dsi->engine_clk);
 	clk_disable_unprepare(dsi->digital_clk);
 	phy_power_off(dsi->phy);
@@ -5775,7 +5778,11 @@ int fbconfig_get_esd_check_test(struct drm_crtc *crtc,
 	struct mtk_drm_crtc *mtk_crtc = to_mtk_crtc(crtc);
 	struct mtk_ddp_comp *output_comp;
 	struct mtk_dsi *dsi;
+<<<<<<< HEAD
 	struct mtk_panel_params *dsi_params = NULL;
+=======
+	struct mtk_panel_params *dsi_params;
+>>>>>>> 4ccec69
 	int cmd_matched = 0;
 	uint32_t i = 0;
 

@@ -427,10 +427,14 @@ static void push_table(void *cmdq, struct LCM_setting_table *table,
 		cmd = table[i].cmd;
 		switch (cmd) {
 		case REGFLAG_DELAY:
+<<<<<<< HEAD
 			if (table[i].count <= 10)
 				MDELAY(table[i].count);
 			else
 				MDELAY(table[i].count);
+=======
+			MDELAY(table[i].count);
+>>>>>>> 4ccec69
 			break;
 		case REGFLAG_UDELAY:
 			UDELAY(table[i].count);
@@ -698,6 +702,10 @@ static void lcm_init(void)
 	MDELAY(10);
 	/* Huaqin modify for HQ-132702 by caogaojie at 2021/06/15 end */
 	/* Huaqin modify for HQ-132702 by liunianliang at 2021/05/20 end */
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+>>>>>>> 4ccec69
 	/* Huaqin modify for HQ-161950 by jiangyue at 2021/11/05 start */
 	if(esd_flag){
 		nvt_bootloader_reset_locked();
@@ -711,6 +719,10 @@ static void lcm_init(void)
 		g_trigger_disp_esd_recovery = false;
 	}
 	/* Huaqin modify for HQ-161950 by jiangyue at 2021/11/05 end */
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 		LCM_LOGI("[DENNIS][%s][%d]\n", __func__, __LINE__);
 	/* Huaqin modify for HQ-140017 by caogaojie at 2021/07/06 start */
 	/* Huaqin modify for HQ-155949 by caogaojie at 2021/09/18 start */

@@ -1690,9 +1690,13 @@ static void process_dbg_opt(const char *opt)
 
 		mtk_crtc = to_mtk_crtc(crtc);
 		comp = mtk_ddp_comp_request_output(mtk_crtc);
+<<<<<<< HEAD
 		if (comp) {
 			comp->funcs->io_cmd(comp, NULL, DSI_LFR_STATUS_CHECK, NULL);
 		}
+=======
+		comp->funcs->io_cmd(comp, NULL, DSI_LFR_STATUS_CHECK, NULL);
+>>>>>>> 4ccec69
 	} else if (strncmp(opt, "tui:", 4) == 0) {
 		unsigned int en, ret;
 

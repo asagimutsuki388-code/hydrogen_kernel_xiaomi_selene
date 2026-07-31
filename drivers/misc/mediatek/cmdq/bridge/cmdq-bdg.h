@@ -9,8 +9,13 @@
 struct cmdq_client;
 struct cmdqRecStruct;
 
+<<<<<<< HEAD
 u32 spi_read_reg(const u32 addr);
 s32 spi_write_reg(const u32 addr, const u32 val);
+=======
+inline u32 spi_read_reg(const u32 addr);
+inline s32 spi_write_reg(const u32 addr, const u32 val);
+>>>>>>> 4ccec69
 
 s32 cmdq_bdg_irq_handler(void);
 

@@ -69,7 +69,7 @@ unsigned int gCapturePriLayerDownX = 20;
 unsigned int gCapturePriLayerDownY = 20;
 unsigned int gCapturePriLayerNum = 4;
 
-#if defined(CONFIG_MTK_ENG_BUILD) || !defined(CONFIG_MTK_GMO_RAM_OPTIMIZE)
+#if defined(CONFIG_MTK_ENG_BUILD)
 static DEFINE_SPINLOCK(gdprec_logger_spinlock);
 
 static struct reg_base_map reg_map[] = {
@@ -1033,9 +1033,11 @@ void dprec_reg_op(void *cmdq, unsigned int reg, unsigned int val,
 {
 	int len = 0;
 
+#ifdef SUPPORT_MMPROFILE /* FIXME: remove when MMP ready */
 	if (!cmdq)
 		mmprofile_log_ex(ddp_mmp_get_events()->dprec_cpu_write_reg,
 			MMPROFILE_FLAG_PULSE, reg, val);
+#endif
 
 	if (cmdq) {
 		if (mask) {

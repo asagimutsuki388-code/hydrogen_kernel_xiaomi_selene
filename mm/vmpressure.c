@@ -430,8 +430,62 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 	if (!memcg && tree)
 		vmpressure_global(gfp, scanned, reclaimed);
 
+<<<<<<< HEAD
 	if (IS_ENABLED(CONFIG_MEMCG))
 		vmpressure_memcg(gfp, memcg, tree, scanned, reclaimed);
+=======
+	/*
+	 * If we got here with no pages scanned, then that is an indicator
+	 * that reclaimer was unable to find any shrinkable LRUs at the
+	 * current scanning depth. But it does not mean that we should
+	 * report the critical pressure, yet. If the scanning priority
+	 * (scanning depth) goes too high (deep), we will be notified
+	 * through vmpressure_prio(). But so far, keep calm.
+	 */
+	if (!scanned)
+		return;
+
+	if (tree) {
+		spin_lock(&vmpr->sr_lock);
+		scanned = vmpr->tree_scanned += scanned;
+		vmpr->tree_reclaimed += reclaimed;
+		spin_unlock(&vmpr->sr_lock);
+
+		if (scanned < vmpressure_win)
+			return;
+		schedule_work(&vmpr->work);
+	} else {
+		enum vmpressure_levels level;
+
+		/* For now, no users for root-level efficiency */
+		if (!memcg || memcg == root_mem_cgroup)
+			return;
+
+		spin_lock(&vmpr->sr_lock);
+		scanned = vmpr->scanned += scanned;
+		reclaimed = vmpr->reclaimed += reclaimed;
+		if (scanned < vmpressure_win) {
+			spin_unlock(&vmpr->sr_lock);
+			return;
+		}
+		vmpr->scanned = vmpr->reclaimed = 0;
+		spin_unlock(&vmpr->sr_lock);
+
+		level = vmpressure_calc_level(scanned, reclaimed);
+
+		if (level > VMPRESSURE_LOW) {
+			/*
+			 * Let the socket buffer allocator know that
+			 * we are having trouble reclaiming LRU pages.
+			 *
+			 * For hysteresis keep the pressure state
+			 * asserted for a second in which subsequent
+			 * pressure events can occur.
+			 */
+			memcg->socket_pressure = jiffies + HZ;
+		}
+	}
+>>>>>>> 4ccec69
 }
 
 /**

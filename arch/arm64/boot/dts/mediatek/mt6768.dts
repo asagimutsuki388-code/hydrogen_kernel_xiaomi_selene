@@ -39,7 +39,11 @@
 vmalloc=400M swiotlb=noforce \
 cgroup.memory=nosocket,nokmem \
 firmware_class.path=/vendor/firmware \
+<<<<<<< HEAD
 page_owner=on quiet nodebugmon loop.max_part=7 noirqdebug";
+=======
+page_owner=on quiet nodebugmon loop.max_part=7";
+>>>>>>> 4ccec69
 		kaslr-seed = <0 0>;
 	};
 
@@ -370,19 +374,6 @@ page_owner=on quiet nodebugmon loop.max_part=7 noirqdebug";
 			alloc-ranges = <0 0x40000000 0 0x50000000>;
 		};
 #endif
-	};
-
-	cpu_dbgapb: cpu_dbgapb@0e010000 {
-		compatible = "mediatek,hw_dbg";
-		num = <8>;
-		reg =	<0 0x0e010000 0 0x1000>,
-			<0 0x0e110000 0 0x1000>,
-			<0 0x0e210000 0 0x1000>,
-			<0 0x0e310000 0 0x1000>,
-			<0 0x0e410000 0 0x1000>,
-			<0 0x0e510000 0 0x1000>,
-			<0 0x0e610000 0 0x1000>,
-			<0 0x0e710000 0 0x1000>;
 	};
 
 	gic: interrupt-controller {
@@ -849,6 +840,7 @@ page_owner=on quiet nodebugmon loop.max_part=7 noirqdebug";
 		compatible = "mediatek,mt67xx-rng";
 	};
 
+#ifdef CONFIG_MTK_SYSTRACKER_V2
 	bus_dbg@10208000 {
 		compatible = "mediatek,bus_dbg-v2";
 		reg = <0 0x10208000 0 0x1000>,
@@ -856,6 +848,7 @@ page_owner=on quiet nodebugmon loop.max_part=7 noirqdebug";
 		mediatek,bus_dbg_con_offset = <0x2fc>;
 		interrupts = <GIC_SPI 158 IRQ_TYPE_LEVEL_LOW>;
 	};
+#endif
 
 	ap_ccif0@10209000 {
 		compatible = "mediatek,ap_ccif0";
@@ -3883,6 +3876,7 @@ defined(CONFIG_MTK_CAM_SECURITY_SUPPORT)
 			pinmux = <PINMUX_GPIO143__FUNC_VOW_CLK_MISO>;
 		};
 	};
+<<<<<<< HEAD
 
 
 	reverse_high: reverse_high {
@@ -3901,6 +3895,8 @@ defined(CONFIG_MTK_CAM_SECURITY_SUPPORT)
 		};
 	};
 };
+=======
+>>>>>>> 4ccec69
 
 /* move shiva tp dts config to here to avoid boot up error */
 #ifdef CONFIG_TARGET_PRODUCT_SHIVACOMMON
@@ -5176,6 +5172,23 @@ defined(CONFIG_MTK_CAM_SECURITY_SUPPORT)
 };
 #endif
 
+
+	reverse_high: reverse_high {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO91__FUNC_GPIO91>;
+			slew-rate = <1>;
+			output-high;
+		};
+	};
+
+	reverse_low: reverse_low {
+		pins_cmd_dat {
+			pinmux = <PINMUX_GPIO91__FUNC_GPIO91>;
+			slew-rate = <1>;
+			output-low;
+		};
+	};
+};
 
 #include "mediatek/mt6358.dtsi"
 #include "mediatek/cust_mt6768_msdc.dtsi"

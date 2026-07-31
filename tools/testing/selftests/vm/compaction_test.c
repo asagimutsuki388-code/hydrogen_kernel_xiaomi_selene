@@ -182,8 +182,11 @@ int main(int argc, char **argv)
 
 	if (prereq() != 0)
 		return ksft_exit_pass();
+<<<<<<< HEAD
 
 	ksft_set_plan(1);
+=======
+>>>>>>> 4ccec69
 
 	lim.rlim_cur = RLIM_INFINITY;
 	lim.rlim_max = RLIM_INFINITY;

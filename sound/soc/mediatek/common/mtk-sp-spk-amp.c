@@ -314,6 +314,7 @@ int mtk_spk_update_dai_link(struct snd_soc_card *card,
 			__func__);
 		return -ENODEV;
 	}
+<<<<<<< HEAD
 #ifdef CONFIG_TARGET_PRODUCT_MERLINCOMMON
 	if (mtk_spk_type == MTK_SPK_NOT_SMARTPA) {
 		dev_dbg(&pdev->dev, "%s(), no need to update dailink\n",
@@ -321,6 +322,8 @@ int mtk_spk_update_dai_link(struct snd_soc_card *card,
 		return 0;
 	}
 #endif
+=======
+>>>>>>> 4ccec69
 	/* find dai link of i2s in and i2s out */
 	for (i = 0; i < card->num_links; i++) {
 		dai_link = &card->dai_link[i];

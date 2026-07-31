@@ -818,7 +818,13 @@ static int32_t nvt_check_crc_done_ilm_err(void)
 
 #endif /* NVT_TOUCH_ESD_DISP_RECOVERY */
 
+<<<<<<< HEAD
 extern bool g_trigger_disp_esd_recovery;
+=======
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+extern bool g_trigger_disp_esd_recovery;
+#endif
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 end */
 /*******************************************************
 Description:
@@ -878,6 +884,10 @@ fail:
 		if (unlikely(retry > 2)) {
 			NVT_ERR("error, retry=%d\n", retry);
 			nvt_read_bld_hw_crc();
+<<<<<<< HEAD
+=======
+#ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 start */
 #if NVT_TOUCH_ESD_DISP_RECOVERY
 			if (nvt_check_crc_done_ilm_err()) {
@@ -885,6 +895,10 @@ fail:
 				g_trigger_disp_esd_recovery = true;
 			}
 #endif /* #if NVT_TOUCH_ESD_DISP_RECOVERY */
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 			break;
 		}
 	}

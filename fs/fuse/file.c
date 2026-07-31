@@ -138,7 +138,10 @@ int fuse_do_open(struct fuse_conn *fc, u64 nodeid, struct file *file,
 			ff->fh = outarg.fh;
 			ff->open_flags = outarg.open_flags;
 			fuse_passthrough_setup(fc, ff, &outarg);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4ccec69
 		} else if (err != -ENOSYS || isdir) {
 			fuse_file_free(ff);
 			return err;
@@ -262,6 +265,8 @@ void fuse_release_common(struct file *file, bool isdir)
 	struct fuse_file *ff = file->private_data;
 	struct fuse_req *req = ff->reserved_req;
 	int opcode = isdir ? FUSE_RELEASEDIR : FUSE_RELEASE;
+	fuse_passthrough_release(&ff->passthrough);
+
 	fuse_passthrough_release(&ff->passthrough);
 
 	fuse_prepare_release(ff, file->f_flags, opcode);
@@ -973,6 +978,7 @@ static ssize_t fuse_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 	struct inode *inode = iocb->ki_filp->f_mapping->host;
 	struct fuse_conn *fc = get_fuse_conn(inode);
+	struct fuse_file *ff = iocb->ki_filp->private_data;
 
 	if (fuse_is_bad(inode))
 		return -EIO;
@@ -1247,6 +1253,10 @@ static ssize_t fuse_file_write_iter(struct kiocb *iocb, struct iov_iter *from)
 	struct inode *inode = mapping->host;
 	ssize_t err;
 	loff_t endbyte = 0;
+	struct fuse_file *ff = file->private_data;
+
+	if (ff->passthrough.filp)
+		return fuse_passthrough_write_iter(iocb, from);
 
 	if (ff->passthrough.filp)
 		return fuse_passthrough_write_iter(iocb, from);

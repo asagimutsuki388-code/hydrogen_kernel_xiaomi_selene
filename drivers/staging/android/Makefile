@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ifeq ($(cc-name),clang)
 ifdef CONFIG_INLINE_OPTIMIZATION
 ccflags-y += -mllvm -inline-threshold=15000
@@ -5,6 +6,8 @@ ccflags-y += -mllvm -inlinehint-threshold=10000
 endif
 endif
 
+=======
+>>>>>>> 4ccec69
 ccflags-y := -O3
 
 ccflags-y += -I$(src)			# needed for trace events

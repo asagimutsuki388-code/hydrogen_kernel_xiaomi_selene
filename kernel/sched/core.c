@@ -43,8 +43,6 @@
 #include "../workqueue_internal.h"
 #include "../smpboot.h"
 
-#include <mt-plat/perf_tracker.h>
-
 #define CREATE_TRACE_POINTS
 #include <trace/events/sched.h>
 #include "walt.h"
@@ -52,7 +50,6 @@
 #if defined(CONFIG_MTK_GIC_V3_EXT)
 #include <linux/irqchip/mtk-gic-extend.h>
 #endif
-#include <mt-plat/l3cc_common.h>
 #ifdef CONFIG_MTK_TASK_TURBO
 #include <mt-plat/turbo_common.h>
 #endif
@@ -71,19 +68,6 @@ DEFINE_MUTEX(sched_isolation_mutex);
 struct cpumask cpu_all_masks;
 struct cpumask available_cpus;
 enum iso_prio_t iso_prio = ISO_UNSET;
-
-/*
- * Debugging: various feature bits
- */
-
-#define SCHED_FEAT(name, enabled)	\
-	(1UL << __SCHED_FEAT_##name) * enabled |
-
-const_debug unsigned int sysctl_sched_features =
-#include "features.h"
-	0;
-
-#undef SCHED_FEAT
 
 /*
  * Number of tasks to iterate in a single balance run.
@@ -297,8 +281,9 @@ static enum hrtimer_restart hrtick(struct hrtimer *timer)
 static void __hrtick_restart(struct rq *rq)
 {
 	struct hrtimer *timer = &rq->hrtick_timer;
+	ktime_t time = rq->hrtick_time;
 
-	hrtimer_start_expires(timer, HRTIMER_MODE_ABS_PINNED);
+	hrtimer_start(timer, time, HRTIMER_MODE_ABS_PINNED);
 }
 
 /*
@@ -323,7 +308,6 @@ static void __hrtick_start(void *arg)
 void hrtick_start(struct rq *rq, u64 delay)
 {
 	struct hrtimer *timer = &rq->hrtick_timer;
-	ktime_t time;
 	s64 delta;
 
 	/*
@@ -331,9 +315,7 @@ void hrtick_start(struct rq *rq, u64 delay)
 	 * doesn't make sense and can cause timer DoS.
 	 */
 	delta = max_t(s64, delay, 10000LL);
-	time = ktime_add_ns(timer->base->get_time(), delta);
-
-	hrtimer_set_expires(timer, time);
+	rq->hrtick_time = ktime_add_ns(timer->base->get_time(), delta);
 
 	if (rq == this_rq()) {
 		__hrtick_restart(rq);
@@ -1283,8 +1265,6 @@ static inline void uclamp_cpu_get_id(struct task_struct *p, struct rq *rq,
 
 	if (rq->uclamp.value[clamp_id] < effective)
 		rq->uclamp.value[clamp_id] = effective;
-
-	trace_uclamp_cpu_get_id(p, rq, clamp_id);
 }
 
 /**
@@ -1340,8 +1320,6 @@ static inline void uclamp_cpu_put_id(struct task_struct *p, struct rq *rq,
 			uclamp_maps[clamp_id][group_id].value;
 		uclamp_cpu_update(rq, clamp_id, clamp_value);
 	}
-
-	trace_uclamp_cpu_put_id(p, rq, clamp_id, clamp_value);
 }
 
 /**
@@ -2997,6 +2975,7 @@ static int ttwu_remote(struct task_struct *p, int wake_flags)
 }
 
 #ifdef CONFIG_SMP
+#if SCHED_FEAT_TTWU_QUEUE
 void sched_ttwu_pending(void)
 {
 	struct rq *rq = this_rq();
@@ -3015,6 +2994,7 @@ void sched_ttwu_pending(void)
 
 	rq_unlock_irqrestore(rq, &rf);
 }
+#endif
 
 void scheduler_ipi(void)
 {
@@ -3026,8 +3006,13 @@ void scheduler_ipi(void)
 	 */
 	preempt_fold_need_resched();
 
+#if SCHED_FEAT_TTWU_QUEUE
 	if (llist_empty(&this_rq()->wake_list) && !got_nohz_idle_kick())
 		return;
+#else
+	if (!got_nohz_idle_kick())
+		return;
+#endif
 
 	/*
 	 * Not all reschedule IPI handlers call irq_enter/irq_exit, since
@@ -3055,6 +3040,7 @@ void scheduler_ipi(void)
 	irq_exit();
 }
 
+#if SCHED_FEAT_TTWU_QUEUE
 static void ttwu_queue_remote(struct task_struct *p, int cpu, int wake_flags)
 {
 	struct rq *rq = cpu_rq(cpu);
@@ -3068,6 +3054,7 @@ static void ttwu_queue_remote(struct task_struct *p, int cpu, int wake_flags)
 			trace_sched_wake_idle_without_ipi(cpu);
 	}
 }
+#endif
 
 void wake_up_if_idle(int cpu)
 {
@@ -3108,11 +3095,14 @@ static void ttwu_queue(struct task_struct *p, int cpu, int wake_flags)
 	struct rq_flags rf;
 
 #if defined(CONFIG_SMP)
-	if (sched_feat(TTWU_QUEUE) && !cpus_share_cache(smp_processor_id(), cpu)) {
+#if SCHED_FEAT_TTWU_QUEUE
+	if ((!idle_cpu(cpu) &&
+			!cpus_share_cache(smp_processor_id(), cpu))) {
 		sched_clock_cpu(cpu); /* Sync clocks across CPUs */
 		ttwu_queue_remote(p, cpu, wake_flags);
 		return;
 	}
+#endif
 #endif
 
 	rq_lock(rq, &rf);
@@ -3912,7 +3902,6 @@ prepare_task_switch(struct rq *rq, struct task_struct *prev,
 	kcov_prepare_switch(prev);
 	sched_info_switch(rq, prev, next);
 	perf_event_task_sched_out(prev, next);
-	hook_ca_context_switch(rq, prev, next);
 	fire_sched_out_preempt_notifiers(prev, next);
 	prepare_lock_switch(rq, next);
 	prepare_arch_switch(next);
@@ -4358,10 +4347,6 @@ void scheduler_tick(void)
 	rq_unlock(rq, &rf);
 
 	perf_event_task_tick();
-
-#ifdef CONFIG_MTK_CACHE_CONTROL
-	hook_ca_scheduler_tick(cpu);
-#endif
 #ifdef CONFIG_MTK_PERF_TRACKER
 	perf_tracker(ktime_get_ns());
 #endif
@@ -4428,7 +4413,6 @@ static inline void preempt_latency_start(int val)
 		unsigned long ip = get_lock_parent_ip();
 #ifdef CONFIG_DEBUG_PREEMPT
 		current->preempt_disable_ip = ip;
-		record_preempt_disable_ips(current);
 #endif
 		trace_preempt_off(CALLER_ADDR0, ip);
 	}
@@ -4509,6 +4493,10 @@ static noinline void __schedule_bug(struct task_struct *prev)
 {
 	/* Save this before calling printk(), since that will clobber it */
 	unsigned long preempt_disable_ip = get_preempt_disable_ip(current);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4ccec69
 	if (oops_in_progress)
 		return;
 
@@ -4523,7 +4511,6 @@ static noinline void __schedule_bug(struct task_struct *prev)
 	    && in_atomic_preempt_off()) {
 		pr_err("Preemption disabled at:");
 		print_ip_sym(preempt_disable_ip);
-		dump_preempt_disable_ips(current);
 		pr_cont("\n");
 	}
 	panic("scheduling while atomic\n");
@@ -5370,8 +5357,10 @@ int idle_cpu(int cpu)
 		return 0;
 
 #ifdef CONFIG_SMP
+#if SCHED_FEAT_TTWU_QUEUE
 	if (!llist_empty(&rq->wake_list))
 		return 0;
+#endif
 #endif
 
 	return 1;
@@ -5741,6 +5730,8 @@ static int _sched_setscheduler(struct task_struct *p, int policy,
  * @policy: new policy.
  * @param: structure containing the new RT priority.
  *
+ * Use sched_set_fifo(), read its comment.
+ *
  * Return: 0 on success. An error code otherwise.
  *
  * NOTE that the task may be already dead.
@@ -5757,6 +5748,11 @@ int sched_setattr(struct task_struct *p, const struct sched_attr *attr)
 	return __sched_setscheduler(p, attr, true, true);
 }
 EXPORT_SYMBOL_GPL(sched_setattr);
+
+int sched_setattr_nocheck(struct task_struct *p, const struct sched_attr *attr)
+{
+	return __sched_setscheduler(p, attr, false, true);
+}
 
 /**
  * sched_setscheduler_nocheck - change the scheduling policy and/or RT priority of a thread from kernelspace.
@@ -5777,6 +5773,51 @@ int sched_setscheduler_nocheck(struct task_struct *p, int policy,
 	return _sched_setscheduler(p, policy, param, false);
 }
 EXPORT_SYMBOL_GPL(sched_setscheduler_nocheck);
+
+/*
+ * SCHED_FIFO is a broken scheduler model; that is, it is fundamentally
+ * incapable of resource management, which is the one thing an OS really should
+ * be doing.
+ *
+ * This is of course the reason it is limited to privileged users only.
+ *
+ * Worse still; it is fundamentally impossible to compose static priority
+ * workloads. You cannot take two correctly working static prio workloads
+ * and smash them together and still expect them to work.
+ *
+ * For this reason 'all' FIFO tasks the kernel creates are basically at:
+ *
+ *   MAX_RT_PRIO / 2
+ *
+ * The administrator _MUST_ configure the system, the kernel simply doesn't
+ * know enough information to make a sensible choice.
+ */
+int sched_set_fifo(struct task_struct *p)
+{
+	struct sched_param sp = { .sched_priority = MAX_RT_PRIO / 2 };
+	return sched_setscheduler_nocheck(p, SCHED_FIFO, &sp);
+}
+EXPORT_SYMBOL_GPL(sched_set_fifo);
+
+/*
+ * For when you don't much care about FIFO, but want to be above SCHED_NORMAL.
+ */
+int sched_set_fifo_low(struct task_struct *p)
+{
+	struct sched_param sp = { .sched_priority = 1 };
+	return sched_setscheduler_nocheck(p, SCHED_FIFO, &sp);
+}
+EXPORT_SYMBOL_GPL(sched_set_fifo_low);
+
+int sched_set_normal(struct task_struct *p, int nice)
+{
+	struct sched_attr attr = {
+		.sched_policy = SCHED_NORMAL,
+		.sched_nice = nice,
+	};
+	return sched_setattr_nocheck(p, &attr);
+}
+EXPORT_SYMBOL_GPL(sched_set_normal);
 
 static int
 do_sched_setscheduler(pid_t pid, int policy, struct sched_param __user *param)
@@ -6191,6 +6232,7 @@ out_put_task:
 }
 
 char sched_lib_name[LIB_PATH_LENGTH];
+<<<<<<< HEAD
 unsigned int sched_lib_mask_force;
 bool is_sched_lib_based_app(pid_t pid)
 {
@@ -6199,6 +6241,15 @@ bool is_sched_lib_based_app(pid_t pid)
 	struct vm_area_struct *vma;
 	char path_buf[LIB_PATH_LENGTH];
 	char *tmp_lib_name;
+=======
+unsigned int sched_lib_mask_check;
+unsigned int sched_lib_mask_force;
+static inline bool is_sched_lib_based_app(pid_t pid)
+{
+	const char *name = NULL;
+	struct vm_area_struct *vma;
+	char path_buf[LIB_PATH_LENGTH];
+>>>>>>> 4ccec69
 	bool found = false;
 	struct task_struct *p;
 	struct mm_struct *mm;
@@ -6206,16 +6257,22 @@ bool is_sched_lib_based_app(pid_t pid)
 	if (strnlen(sched_lib_name, LIB_PATH_LENGTH) == 0)
 		return false;
 
+<<<<<<< HEAD
 	tmp_lib_name = kmalloc(LIB_PATH_LENGTH, GFP_KERNEL);
 	if (!tmp_lib_name)
 		return false;
 
+=======
+>>>>>>> 4ccec69
 	rcu_read_lock();
 
 	p = find_process_by_pid(pid);
 	if (!p) {
 		rcu_read_unlock();
+<<<<<<< HEAD
 		kfree(tmp_lib_name);
+=======
+>>>>>>> 4ccec69
 		return false;
 	}
 
@@ -6235,6 +6292,7 @@ bool is_sched_lib_based_app(pid_t pid)
 			if (IS_ERR(name))
 				goto release_sem;
 
+<<<<<<< HEAD
 			strlcpy(tmp_lib_name, sched_lib_name, LIB_PATH_LENGTH);
 			lib_list = tmp_lib_name;
 			while ((libname = strsep(&lib_list, ","))) {
@@ -6244,6 +6302,12 @@ bool is_sched_lib_based_app(pid_t pid)
 					found = true;
 					goto release_sem;
 				}
+=======
+			if (strnstr(name, sched_lib_name,
+					strnlen(name, LIB_PATH_LENGTH))) {
+				found = true;
+				break;
+>>>>>>> 4ccec69
 			}
 		}
 	}
@@ -6253,10 +6317,29 @@ release_sem:
 	mmput(mm);
 put_task_struct:
 	put_task_struct(p);
+<<<<<<< HEAD
 	kfree(tmp_lib_name);
 	return found;
 }
 
+=======
+	return found;
+}
+
+long msm_sched_setaffinity(pid_t pid, struct cpumask *new_mask)
+{
+	if (sched_lib_mask_check != 0 && sched_lib_mask_force != 0 &&
+		(cpumask_bits(new_mask)[0] == sched_lib_mask_check) &&
+		is_sched_lib_based_app(pid)) {
+
+		cpumask_t forced_mask = { {sched_lib_mask_force} };
+
+		cpumask_copy(new_mask, &forced_mask);
+	}
+	return sched_setaffinity(pid, new_mask);
+}
+
+>>>>>>> 4ccec69
 static int get_user_cpu_mask(unsigned long __user *user_mask_ptr, unsigned len,
 			     struct cpumask *new_mask)
 {
@@ -6287,7 +6370,7 @@ SYSCALL_DEFINE3(sched_setaffinity, pid_t, pid, unsigned int, len,
 
 	retval = get_user_cpu_mask(user_mask_ptr, len, new_mask);
 	if (retval == 0)
-		retval = sched_setaffinity(pid, new_mask);
+		retval = msm_sched_setaffinity(pid, new_mask);
 	free_cpumask_var(new_mask);
 	return retval;
 }
@@ -7992,7 +8075,6 @@ void ___might_sleep(const char *file, int line, int preempt_offset)
 	    && !preempt_count_equals(preempt_offset)) {
 		pr_err("Preemption disabled at:");
 		print_ip_sym(preempt_disable_ip);
-		dump_preempt_disable_ips(current);
 		pr_cont("\n");
 	}
 	dump_stack();

@@ -560,8 +560,13 @@ static int aio_setup_ring(struct kioctx *ctx, unsigned int nr_events)
 
 void kiocb_set_cancel_fn(struct kiocb *iocb, kiocb_cancel_fn *cancel)
 {
+<<<<<<< HEAD
 	struct aio_kiocb *req = container_of(iocb, struct aio_kiocb, rw);
 	struct kioctx *ctx = req->ki_ctx;
+=======
+	struct aio_kiocb *req;
+	struct kioctx *ctx;
+>>>>>>> 4ccec69
 	unsigned long flags;
 
 	if (WARN_ON_ONCE(!list_empty(&req->ki_list)))
@@ -572,6 +577,12 @@ void kiocb_set_cancel_fn(struct kiocb *iocb, kiocb_cancel_fn *cancel)
 	 * ignore it.
 	 */
 	if (!(iocb->ki_flags & IOCB_AIO_RW))
+		return;
+
+	req = container_of(iocb, struct aio_kiocb, rw);
+	ctx = req->ki_ctx;
+
+	if (WARN_ON_ONCE(!list_empty(&req->ki_list)))
 		return;
 
 	spin_lock_irqsave(&ctx->ctx_lock, flags);

@@ -19,7 +19,6 @@ subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLA
 subdir-ccflags-y += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/
 subdir-ccflags-y += -I$(srctree)/drivers/mmc/host/mediatek/$(MTK_PLATFORM)
 
-obj-$(CONFIG_MTK_L3C_PART) += l3c_part/
 obj-$(CONFIG_MTK_EMI) += emi/
 obj-$(CONFIG_MTK_EMI_BWL)	+= emi_bwl/
 obj-$(CONFIG_MTK_EMI_MPU) += emi_mpu/
@@ -29,7 +28,6 @@ obj-$(CONFIG_MTK_SERIAL)	+= uart/
 obj-$(CONFIG_MTK_PMIC_NEW_ARCH)	+= pmic/
 obj-$(CONFIG_MTK_M4U)   += m4u/
 obj-$(CONFIG_MTK_PSEUDO_M4U)   += pseudo_m4u/
-obj-$(CONFIG_MTK_ICE_DEBUG) += ice_debug/
 obj-y += mmdvfs/
 ifneq ($(CONFIG_MTK_SYSTRACKER_DISABLE),y)
 obj-$(CONFIG_MTK_SYSTRACKER_V2)   += systracker/
@@ -58,7 +56,6 @@ obj-y += timer/
 obj-$(CONFIG_MTK_ACCDET) += accdet/
 obj-$(CONFIG_MTK_DRAMC) += dramc/
 obj-$(CONFIG_MTK_DRAMC_WA) += dramc/
-obj-$(CONFIG_MTK_DBGTOP) += dbgtop/
 obj-$(CONFIG_MTK_DEBUG_LATCH) += debug_latch/
 obj-$(CONFIG_MTK_DEBUG_TRACER)	+= debug_tracer/
 obj-$(CONFIG_MTK_GIC_EXT) += ext_gic/
@@ -77,7 +74,6 @@ obj-$(CONFIG_RT_FLASHLIGHT)     += flashlight/richtek/
 obj-$(CONFIG_MTK_VPU_SUPPORT) += vpu/
 obj-$(CONFIG_MTK_IN_HOUSE_TEE_SUPPORT) += mtee/
 obj-$(CONFIG_MTK_IN_HOUSE_TEE_SUPPORT) += gcpu/
-obj-$(CONFIG_MTK_MLOG) += mlog/
 obj-$(CONFIG_MTK_AUXADC)	+= auxadc/
 obj-$(CONFIG_MTK_GPT_SCHEME_SUPPORT)	+= partition/
 obj-$(CONFIG_MTK_PWM)	    += pwm/
@@ -97,7 +93,10 @@ obj-$(CONFIG_MTK_CCCI_DEVICES)	+=  ccci_util/
 obj-$(CONFIG_MTK_NET_CCMNI) +=  ccmni/
 obj-$(CONFIG_MTK_ECCCI_DRIVER) +=  eccci/
 obj-$(CONFIG_MTK_SSMR) += memory-ssmr/
+<<<<<<< HEAD
 obj-y += cache-auditor/
+=======
+>>>>>>> 4ccec69
 obj-$(CONFIG_MTK_AMMS) += memory-amms/
 obj-$(CONFIG_ZONE_MOVABLE_CMA) += zone_movable_cma/
 obj-$(CONFIG_MTK_VIBRATOR) += vibrator/
@@ -165,7 +164,6 @@ obj-y += mtprintk/
 ifneq ($(wildcard $(srctree)/drivers/misc/mediatek/met_drv/),)
 obj-y += met_drv/
 endif
-obj-y += perf/
 obj-$(CONFIG_MTK_JPEG) += jpeg/
 obj-$(CONFIG_MTK_SPMTWAM) += twam/
 obj-$(CONFIG_MTK_LOW_POWER_MODULE) += lpm/

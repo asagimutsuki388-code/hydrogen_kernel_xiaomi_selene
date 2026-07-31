@@ -771,8 +771,13 @@ struct ion_handle *__ion_alloc(struct ion_client *client, size_t len,
 			 (unsigned long)client, (unsigned long)handle);
 
 #ifdef CONFIG_MTK_ION
+#ifdef ION_HISTORY_RECORD
 	ion_history_count_kick(true, len);
 #endif
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 
 	return handle;
 }
@@ -813,7 +818,9 @@ void ion_free_nolock(struct ion_client *client,
 	}
 	ion_handle_put_nolock(handle);
 #ifdef CONFIG_MTK_ION
+#ifdef ION_HISTORY_RECORD
 	ion_history_count_kick(false, 0);
+#endif
 #endif
 }
 
@@ -1755,10 +1762,25 @@ static int ion_dma_buf_begin_cpu_access(struct dma_buf *dmabuf,
 	struct ion_buffer *buffer = dmabuf->priv;
 	struct ion_dma_buf_attachment *a;
 
+<<<<<<< HEAD
 	mutex_lock(&buffer->lock);
 	list_for_each_entry(a, &buffer->attachments, list) {
 		dma_sync_sg_for_cpu(a->dev, a->table->sgl, a->table->nents,
 				    direction);
+=======
+	if (ion_iommu_heap_type(buffer) ||
+	    buffer->heap->type == (int)ION_HEAP_TYPE_SYSTEM) {
+		IONMSG("%s iommu device, to cache sync\n", __func__);
+
+		mutex_lock(&buffer->lock);
+		list_for_each_entry(a, &buffer->attachments, list) {
+			dma_sync_sg_for_cpu(a->dev,
+					    a->table->sgl,
+					    a->table->nents,
+					    direction);
+		}
+		mutex_unlock(&buffer->lock);
+>>>>>>> 4ccec69
 	}
 	mutex_unlock(&buffer->lock);
 
@@ -1771,10 +1793,25 @@ static int ion_dma_buf_end_cpu_access(struct dma_buf *dmabuf,
 	struct ion_buffer *buffer = dmabuf->priv;
 	struct ion_dma_buf_attachment *a;
 
+<<<<<<< HEAD
 	mutex_lock(&buffer->lock);
 	list_for_each_entry(a, &buffer->attachments, list) {
 		dma_sync_sg_for_device(a->dev, a->table->sgl, a->table->nents,
 				       direction);
+=======
+	if (ion_iommu_heap_type(buffer) ||
+	    buffer->heap->type == (int)ION_HEAP_TYPE_SYSTEM) {
+		IONMSG("%s iommu device, to cache sync\n", __func__);
+
+		mutex_lock(&buffer->lock);
+		list_for_each_entry(a, &buffer->attachments, list) {
+			dma_sync_sg_for_device(a->dev,
+					       a->table->sgl,
+					       a->table->nents,
+					       direction);
+		}
+		mutex_unlock(&buffer->lock);
+>>>>>>> 4ccec69
 	}
 	mutex_unlock(&buffer->lock);
         }
@@ -2778,12 +2815,15 @@ struct ion_buffer *ion_drv_file_to_buffer(struct file *file)
 
 	if (strstr(pathname, "dmabuf")) {
 		dmabuf = file->private_data;
+		if (!dmabuf) {
+			IONMSG("%s warnning, dmabuf is NULL\n", __func__);
+			goto file2buf_exit;
+		}
 		if (dmabuf->ops == &dma_buf_ops)
 			buffer = dmabuf->priv;
 	}
 
 file2buf_exit:
-
 	if (buffer)
 		return buffer;
 	else

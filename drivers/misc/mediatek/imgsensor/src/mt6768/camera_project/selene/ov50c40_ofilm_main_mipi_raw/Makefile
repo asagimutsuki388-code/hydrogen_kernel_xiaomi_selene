@@ -11,5 +11,9 @@
 # GNU General Public License for more details.
 #
 
+<<<<<<<< HEAD:drivers/misc/mediatek/imgsensor/src/mt6768/camera_project/selene/ov50c40_ofilm_main_mipi_raw/Makefile
 obj-y += ov50c40_ofilm_main_mipi_raw.o
 
+========
+obj-y += gc02m1_macro_mipiraw_Sensor.o
+>>>>>>>> 4ccec69:drivers/misc/mediatek/imgsensor/src/mt6768/camera_project/k69v1_64/gc02m1_macro_mipi_raw/Makefile

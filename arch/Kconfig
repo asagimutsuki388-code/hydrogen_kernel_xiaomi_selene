@@ -791,6 +791,7 @@ config HAVE_IRQ_TIME_ACCOUNTING
 	  Archs need to ensure they use a high enough resolution clock to
 	  support irq time accounting and then call enable_sched_clock_irqtime().
 
+<<<<<<< HEAD
 config HAVE_MOVE_PUD
 	bool
 	help
@@ -798,6 +799,8 @@ config HAVE_MOVE_PUD
 	  PUD level. If there are only 3 page table levels, the move effectively
 	  happens at the PGD level.
 
+=======
+>>>>>>> 4ccec69
 config HAVE_MOVE_PMD
 	bool
 	help

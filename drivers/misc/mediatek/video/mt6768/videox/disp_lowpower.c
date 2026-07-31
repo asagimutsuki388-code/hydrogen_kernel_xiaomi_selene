@@ -235,12 +235,6 @@ static void set_share_sram(unsigned int is_share_sram)
 {
 	if (golden_setting_pgc->is_wrot_sram != is_share_sram)
 		golden_setting_pgc->is_wrot_sram = is_share_sram;
-	if (is_share_sram)
-		mmprofile_log_ex(ddp_mmp_get_events()->share_sram,
-		MMPROFILE_FLAG_START, 0, 0);
-	else
-		mmprofile_log_ex(ddp_mmp_get_events()->share_sram,
-		MMPROFILE_FLAG_END, 0, 0);
 }
 
 static unsigned int use_wrot_sram(void)
@@ -373,7 +367,13 @@ int primary_display_dsi_vfp_change(int state)
 	}
 
 	if (state == 1 || state == 0) {
+<<<<<<< HEAD
 		if (bdg_is_bdg_connected() == 1) {
+=======
+	/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 start */
+		if (pgc->vfp_chg_sync_bdg && bdg_is_bdg_connected() == 1) {
+	/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 end */
+>>>>>>> 4ccec69
 			cmdqRecWait(handle, CMDQ_EVENT_MUTEX0_STREAM_EOF);
 
 			/* 2.stop dsi vdo mode */
@@ -397,10 +397,17 @@ int primary_display_dsi_vfp_change(int state)
 						DDP_DSI_PORCH_CHANGE, &apply_vfp);
 		}
 	}
+<<<<<<< HEAD
 /* Huaqin modify for HQ-141739 by caogaojie at 2021/07/05 start */
 	if (bdg_is_bdg_connected() != 1)
 		cmdqRecFlushAsync(handle);
 /* Huaqin modify for HQ-141739 by caogaojie at 2021/07/05 end*/
+=======
+/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 start */
+	if (!pgc->vfp_chg_sync_bdg)
+		cmdqRecFlushAsync(handle);
+/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 end */
+>>>>>>> 4ccec69
 	cmdqRecDestroy(handle);
 	return ret;
 }
@@ -757,13 +764,15 @@ void _primary_display_enable_mmsys_clk(void)
 	if (primary_display_is_decouple_mode()) {
 		data_config =
 			dpmgr_path_get_last_config(primary_get_dpmgr_handle());
-		data_config->rdma_dirty = 1;
+		if (data_config != NULL)
+			data_config->rdma_dirty = 1;
 		dpmgr_path_config(primary_get_dpmgr_handle(), data_config,
 			NULL);
 
 		data_config = dpmgr_path_get_last_config(
 			primary_get_ovl2mem_handle());
-		data_config->dst_dirty = 1;
+		if (data_config != NULL)
+			data_config->dst_dirty = 1;
 		dpmgr_path_config(primary_get_ovl2mem_handle(), data_config,
 			NULL);
 		dpmgr_path_ioctl(primary_get_ovl2mem_handle(), NULL,
@@ -895,13 +904,7 @@ void _vdo_mode_enter_idle(void)
 #ifdef MTK_FB_MMDVFS_SUPPORT
 	/* update bandwidth */
 	disp_get_rdma_bandwidth(out_fps, &bandwidth);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_START,
-			!primary_display_is_decouple_mode(), bandwidth);
 	pm_qos_update_request(&primary_display_qos_request, bandwidth);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_END,
-			!primary_display_is_decouple_mode(), bandwidth);
 #endif
 
 }
@@ -969,13 +972,7 @@ void _vdo_mode_leave_idle(void)
 #ifdef MTK_FB_MMDVFS_SUPPORT
 	/* update bandwidth */
 	disp_get_ovl_bandwidth(in_fps, out_fps, &bandwidth);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_START,
-			!primary_display_is_decouple_mode(), bandwidth);
 	pm_qos_update_request(&primary_display_qos_request, bandwidth);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_END,
-			!primary_display_is_decouple_mode(), bandwidth);
 #endif
 
 }
@@ -1005,13 +1002,7 @@ void _cmd_mode_enter_idle(void)
 
 #ifdef MTK_FB_MMDVFS_SUPPORT
 	/* update bandwidth */
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_START,
-			!primary_display_is_decouple_mode(), 0);
 	pm_qos_update_request(&primary_display_qos_request, 0);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_END,
-			!primary_display_is_decouple_mode(), 0);
 #endif
 
 }
@@ -1050,13 +1041,7 @@ void _cmd_mode_leave_idle(void)
 	primary_fps_ctx_get_fps(&in_fps, &stable);
 	out_fps = in_fps;
 	disp_get_ovl_bandwidth(in_fps, out_fps, &bandwidth);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_START,
-			!primary_display_is_decouple_mode(), bandwidth);
 	pm_qos_update_request(&primary_display_qos_request, bandwidth);
-	mmprofile_log_ex(ddp_mmp_get_events()->primary_pm_qos,
-			MMPROFILE_FLAG_END,
-			!primary_display_is_decouple_mode(), bandwidth);
 	primary_display_request_dvfs_perf(0, dvfs_before_idle);
 #endif
 
@@ -1107,6 +1092,16 @@ int primary_display_request_dvfs_perf(
 			opp_level = HRT_OPP_LEVEL_DEFAULT;
 			break;
 		}
+<<<<<<< HEAD
+=======
+		emi_opp =
+			(opp_level >= HRT_OPP_LEVEL_DEFAULT) ?
+				PM_QOS_DDR_OPP_DEFAULT_VALUE : opp_level;
+		mm_freq =
+			(opp_level >= HRT_OPP_LEVEL_DEFAULT) ?
+				PM_QOS_MM_FREQ_DEFAULT_VALUE :
+			layering_rule_get_mm_freq_table(opp_level);
+>>>>>>> 4ccec69
 #else
 	if (atomic_read(&dvfs_ovl_req_status) != req) {
 		switch (req) {
@@ -1129,26 +1124,24 @@ int primary_display_request_dvfs_perf(
 			opp_level = HRT_OPP_LEVEL_LEVEL0;
 			break;
 		}
+<<<<<<< HEAD
 #endif
 		emi_opp =
 			(opp_level >= HRT_OPP_LEVEL_DEFAULT) ?
 				PM_QOS_DDR_OPP_DEFAULT_VALUE : opp_level;
+=======
+
+		emi_opp =  opp_level;
+>>>>>>> 4ccec69
 		mm_freq =
-			(opp_level >= HRT_OPP_LEVEL_DEFAULT) ?
-				PM_QOS_MM_FREQ_DEFAULT_VALUE :
 			layering_rule_get_mm_freq_table(opp_level);
+#endif
 
 		/*scenario:MMDVFS_SCEN_DISP(0x17),SMI_BWC_SCEN_UI_IDLE(0xb)*/
-		mmprofile_log_ex(ddp_mmp_get_events()->dvfs,
-			MMPROFILE_FLAG_START,
-			scenario, (req << 16) |
-			(atomic_read(&dvfs_ovl_req_status) & 0xFFFF));
 		pm_qos_update_request(&primary_display_emi_opp_request,
 					emi_opp);
 		pm_qos_update_request(&primary_display_mm_freq_request,
 					mm_freq);
-		mmprofile_log_ex(ddp_mmp_get_events()->dvfs, MMPROFILE_FLAG_END,
-			scenario, (mm_freq << 16) | (emi_opp & 0xFFFF));
 
 		atomic_set(&dvfs_ovl_req_status, req);
 	}
@@ -1172,7 +1165,11 @@ static int _primary_path_idlemgr_monitor_thread(void *data)
 	unsigned long long interval = 0;
 	unsigned long long time_diff;
 
+#ifdef CONFIG_MTK_MT6382_BDG_BUF7
+	msleep(26000);
+#else
 	msleep(16000);
+#endif
 	while (1) {
 		ret = wait_event_interruptible(idlemgr_pgc->idlemgr_wait_queue,
 			atomic_read(&idlemgr_task_wakeup));
@@ -1181,8 +1178,6 @@ static int _primary_path_idlemgr_monitor_thread(void *data)
 		interval = idle_check_interval * 1000 * 1000 - time_diff;
 		do_div(interval, 1000000);
 
-		mmprofile_log_ex(ddp_mmp_get_events()->idle_monitor,
-			MMPROFILE_FLAG_PULSE, idle_check_interval, interval);
 
 		/* error handling */
 		interval = (long long)interval > 1000 ? 1000 : interval;
@@ -1229,8 +1224,6 @@ static int _primary_path_idlemgr_monitor_thread(void *data)
 		}
 		/* double check if dynamic switch on/off */
 		if (atomic_read(&idlemgr_task_wakeup)) {
-			mmprofile_log_ex(ddp_mmp_get_events()->idlemgr,
-				MMPROFILE_FLAG_START, 0, 0);
 			DISPINFO("[disp_lowpower]primary enter idle state\n");
 
 			/* enter idle state */
@@ -1381,8 +1374,6 @@ void primary_display_idlemgr_kick(const char *source, int need_lock)
 {
 	char log[128] = "";
 
-	mmprofile_log_ex(ddp_mmp_get_events()->idlemgr, MMPROFILE_FLAG_PULSE,
-		1, 0);
 
 	snprintf(log, sizeof(log), "[kick]%s kick at %lld\n",
 		source, sched_clock());
@@ -1401,8 +1392,6 @@ void primary_display_idlemgr_kick(const char *source, int need_lock)
 		primary_display_idlemgr_leave_idle_nolock();
 		primary_display_set_idle_stat(0);
 
-		mmprofile_log_ex(ddp_mmp_get_events()->idlemgr,
-			MMPROFILE_FLAG_END, 0, 0);
 		/* wake up idlemgr process to monitor next idle stat */
 		wake_up_interruptible(&(idlemgr_pgc->idlemgr_wait_queue));
 	}

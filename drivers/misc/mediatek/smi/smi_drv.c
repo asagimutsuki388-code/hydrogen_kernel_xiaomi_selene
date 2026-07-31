@@ -61,6 +61,7 @@ static bool smi_sspm_ipi_register;
 #undef pr_fmt
 #define pr_fmt(fmt) "[" DEV_NAME "]" fmt
 
+<<<<<<< HEAD
 #define SMIDBG(string, args...) pr_debug(string, ##args)
 
 #if IS_ENABLED(CONFIG_MTK_CMDQ_MBOX_EXT)
@@ -89,6 +90,11 @@ static bool smi_sspm_ipi_register;
 		pr_err(string, ##args); \
 		aee_kernel_warning(DEV_NAME, string, ##args); \
 	} while (0)
+=======
+#define SMIDBG(string, args...) ((void)0)
+#define SMIWRN(cmdq, string, args...) ((void)0)
+#define SMIERR(string, args...) pr_err(string, ##args)
+>>>>>>> 4ccec69
 
 #ifndef ATOMR_CLK
 #define ATOMR_CLK(i) atomic_read(&(smi_dev[(i)]->clk_cnts))
@@ -621,6 +627,7 @@ EXPORT_SYMBOL_GPL(smi_sysram_enable);
 static inline void
 smi_debug_print(const bool gce, const u32 num, const u32 *pos, const u32 *val)
 {
+#if 0
 	char buf[LINK_MAX + 1];
 	s32 len, i, j, ret;
 
@@ -648,10 +655,12 @@ smi_debug_print(const bool gce, const u32 num, const u32 *pos, const u32 *val)
 		}
 		SMIWRN(gce, "%s\n", buf);
 	}
+#endif
 }
 
 static s32 smi_debug_dumper(const bool gce, const bool off, const u32 id)
 {
+#if 0
 	char *name;
 	void __iomem *base;
 	u32 nr_debugs, *debugs, temp[MAX_INPUT];
@@ -710,11 +719,13 @@ static s32 smi_debug_dumper(const bool gce, const bool off, const u32 id)
 		name, id, ATOMR_CLK(j));
 	smi_debug_print(gce, nr_debugs, debugs, temp);
 #endif
+#endif
 	return 0;
 }
 
 static void smi_debug_dump_status(const bool gce)
 {
+#if 0
 	s32 on, i;
 
 	for (i = 0; i <= SMI_DEV_NUM; i++)
@@ -733,6 +744,7 @@ static void smi_debug_dump_status(const bool gce)
 			on ? ' ' : '*', smi_record[i][0].sec,
 			smi_record[i][0].nsec, smi_record[i][0].user);
 	}
+#endif
 }
 
 s32 smi_debug_bus_hang_detect(const bool gce, const char *user)

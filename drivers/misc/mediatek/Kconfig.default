@@ -11,7 +11,6 @@ config ANDROID_DEFAULT_SETTING
 	select BINFMT_SCRIPT
 	select BLK_DEV_INITRD
 	select BLK_DEV_LOOP
-	select BLK_DEV_RAM
 	select BLOCK
 	select BPF_JIT
 	select BPF_JIT_ALWAYS_ON if ARM64
@@ -55,7 +54,6 @@ config ANDROID_DEFAULT_SETTING
 	select FS_VERITY_BUILTIN_SIGNATURES
 	select FUSE_FS
 	select FUTEX
-	select HARDENED_USERCOPY
 	select HID_GENERIC
 	select HID_NINTENDO
 	select HID_MULTITOUCH
@@ -117,9 +115,6 @@ config ANDROID_DEFAULT_SETTING
 	select MEMCG
 	select MEMCG_SWAP
 	select MMU
-	select MODULES
-	select MODULE_UNLOAD
-	select MODVERSIONS
 	select MTK_AMMS
 	select MULTIUSER
 	select NAMESPACES
@@ -241,6 +236,10 @@ config ANDROID_DEFAULT_SETTING
 	select UID_SYS_STATS
 	select UNIX
 	select UNICODE
+<<<<<<< HEAD
+=======
+	select UNMAP_KERNEL_AT_EL0
+>>>>>>> 4ccec69
 	select USB
 	select USB_CONFIGFS
 	select USB_CONFIGFS_F_ACC

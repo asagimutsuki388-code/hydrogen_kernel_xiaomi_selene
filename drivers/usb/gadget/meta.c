@@ -1200,6 +1200,7 @@ static struct usb_composite_driver android_usb_driver = {
 #endif
 };
 
+<<<<<<< HEAD
 #define USB_STATE_MONITOR_DELAY 3000
 static struct delayed_work android_usb_state_monitor_work;
 static void do_android_usb_state_monitor_work(struct work_struct *work)
@@ -1236,6 +1237,8 @@ void trigger_android_usb_state_monitor_work(void)
 
 };
 
+=======
+>>>>>>> 4ccec69
 static int android_create_device(struct android_dev *dev)
 {
 	struct device_attribute **attrs = android_usb_attributes;
@@ -1256,8 +1259,6 @@ static int android_create_device(struct android_dev *dev)
 			return err;
 		}
 	}
-
-	trigger_android_usb_state_monitor_work();
 
 	return 0;
 }

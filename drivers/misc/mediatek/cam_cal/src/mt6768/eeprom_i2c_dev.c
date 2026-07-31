@@ -14,6 +14,7 @@
 
 static enum EEPROM_I2C_DEV_IDX gi2c_dev_sel[IMGSENSOR_SENSOR_IDX_MAX_NUM] = {
 	I2C_DEV_IDX_1, /* main */
+<<<<<<< HEAD
 #ifdef CONFIG_TARGET_PRODUCT_MERLINCOMMON
 	I2C_DEV_IDX_2, /* sub */
 #else
@@ -26,6 +27,12 @@ static enum EEPROM_I2C_DEV_IDX gi2c_dev_sel[IMGSENSOR_SENSOR_IDX_MAX_NUM] = {
 #else
 	I2C_DEV_IDX_1, /* main3 */
 #endif
+=======
+	I2C_DEV_IDX_3, /* sub */
+	I2C_DEV_IDX_3, /* main2 */
+	I2C_DEV_IDX_2, /* sub2 */
+	I2C_DEV_IDX_1, /* main3 */
+>>>>>>> 4ccec69
 };
 
 enum EEPROM_I2C_DEV_IDX get_i2c_dev_sel(enum IMGSENSOR_SENSOR_IDX idx)

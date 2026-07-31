@@ -11,8 +11,12 @@
  * See http://www.gnu.org/licenses/gpl-2.0.html for more details.
  */
 #include "imgsensor_cfg_table.h"
+<<<<<<< HEAD
 #if defined(MERLIN_MSM_CAMERA_HW_INFO) || defined(LANCELOT_MSM_CAMERA_HW_INFO)\
 || defined(GALAHAD_MSM_CAMERA_HW_INFO) || defined(SHIVA_MSM_CAMERA_HW_INFO) || defined(SELENE_MSM_CAMERA_HW_INFO)
+=======
+#if defined(SELENE_MSM_CAMERA_HW_INFO)
+>>>>>>> 4ccec69
 #include "hq_imgsensor_hw_register_info.h"
 #endif
 #include <linux/platform_device.h>
@@ -601,8 +605,12 @@ int imgsensor_set_driver(struct IMGSENSOR_SENSOR *psensor)
 					    psensor->inst.sensor_idx,
 					    drv_idx,
 					    psensor_inst->psensor_name);
+<<<<<<< HEAD
 #if defined(MERLIN_MSM_CAMERA_HW_INFO) || defined(LANCELOT_MSM_CAMERA_HW_INFO) \
 || defined(GALAHAD_MSM_CAMERA_HW_INFO) || defined(SHIVA_MSM_CAMERA_HW_INFO) || defined(SELENE_MSM_CAMERA_HW_INFO)
+=======
+#if defined(SELENE_MSM_CAMERA_HW_INFO)
+>>>>>>> 4ccec69
 					hq_imgsensor_sensor_hw_register(psensor, psensor_inst);
 #endif
 					ret = drv_idx;

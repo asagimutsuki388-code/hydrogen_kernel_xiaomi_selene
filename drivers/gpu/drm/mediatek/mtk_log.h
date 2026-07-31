@@ -74,7 +74,7 @@ int mtk_dprec_logger_pr(unsigned int type, char *fmt, ...);
 #define DDPPR_ERR(fmt, arg...)                                                 \
 	do {                                                                   \
 		mtk_dprec_logger_pr(DPREC_LOGGER_ERROR, fmt, ##arg);           \
-		pr_err(pr_fmt(fmt), ##arg);              \
+		pr_debug(pr_fmt(fmt), ##arg);              \
 	} while (0)
 
 #define DDPIRQ(fmt, arg...)                                                    \

@@ -260,8 +260,11 @@ static irqreturn_t _esd_check_ext_te_irq_handler(int irq, void *data)
 /* Huaqin add for HQ-124138 by dongtingchi at 2021/04/29 start */
 #ifdef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
 	DISPCHECK("[ESD] _esd_check_ext_te_irq_handler start");
+<<<<<<< HEAD
 	mmprofile_log_ex(ddp_mmp_get_events()->esd_vdo_eint,
 		MMPROFILE_FLAG_PULSE, 0, 0);
+=======
+>>>>>>> 4ccec69
 	if(atomic_read(&lcm_ready)){
 		if(atomic_read(&lcm_valid_irq)){
 			atomic_set(&lcm_valid_irq, 0);
@@ -279,8 +282,11 @@ static irqreturn_t _esd_check_ext_te_irq_handler(int irq, void *data)
 	/* Huaqin modify for HQ-139071 by caogaojie at 2021/06/07 end */
 		DISPCHECK("[ESD] _esd_check_ext_te_irq_handler lcm not ready, skip");
 #else
+<<<<<<< HEAD
 	mmprofile_log_ex(ddp_mmp_get_events()->esd_vdo_eint,
 		MMPROFILE_FLAG_PULSE, 0, 0);
+=======
+>>>>>>> 4ccec69
 	atomic_set(&esd_ext_te_event, 1);
 	DISPINFO("[ESD]%s\n", __func__);
 	wake_up_interruptible(&esd_ext_te_wq);
@@ -321,13 +327,16 @@ int do_esd_check_eint(void)
 	atomic_set(&esd_ext_te_event, 0);
 
 	disable_irq(te_irq);
+<<<<<<< HEAD
+=======
+/* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 start */
+	return ret || g_trigger_disp_esd_recovery;
+/* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 end */
+>>>>>>> 4ccec69
 #else
 	int ret = 0;
-	mmp_event mmp_te = ddp_mmp_get_events()->esd_extte;
 
 	DISPINFO("[ESD]ESD check eint\n");
-	mmprofile_log_ex(mmp_te, MMPROFILE_FLAG_PULSE,
-		primary_display_is_video_mode(), GPIO_EINT_MODE);
 	primary_display_switch_esd_mode(GPIO_EINT_MODE);
 
 	if (wait_event_interruptible_timeout(esd_ext_te_wq,
@@ -339,11 +348,18 @@ int do_esd_check_eint(void)
 	atomic_set(&esd_ext_te_event, 0);
 
 	primary_display_switch_esd_mode(GPIO_DSI_MODE);
+<<<<<<< HEAD
 #endif
 /* Huaqin add for HQ-124138 by dongtingchi at 2021/04/29 end */
 /* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 start */
 	return ret || g_trigger_disp_esd_recovery;
 /* Huaqin modify for HQ-144782 by caogaojie at 2021/07/05 end */
+=======
+
+	return ret;
+#endif
+/* Huaqin add for HQ-124138 by dongtingchi at 2021/04/29 end */
+>>>>>>> 4ccec69
 }
 
 int do_esd_check_dsi_te(void)
@@ -364,15 +380,16 @@ int do_esd_check_read(void)
 	int ret = 0;
 	struct cmdqRecStruct *qhandle = NULL;
 	disp_path_handle phandle = primary_get_dpmgr_handle();
-	mmp_event mmp_te = ddp_mmp_get_events()->esd_extte;
 
 	DISPCHECK("[ESD]ESD check read\n");
-	mmprofile_log_ex(mmp_te, MMPROFILE_FLAG_PULSE,
-		primary_display_is_video_mode(), GPIO_DSI_MODE);
 
 	/* only cmd mode read & with disable mmsys clk will kick */
 	if ((disp_helper_get_option(DISP_OPT_IDLEMGR_ENTER_ULPS) &&
+<<<<<<< HEAD
 	    !primary_display_is_video_mode()) || bdg_is_bdg_connected() == 1)
+=======
+	    !primary_display_is_video_mode()))
+>>>>>>> 4ccec69
 		primary_display_idlemgr_kick((char *)__func__, 1);
 
 	/* 0.create esd check cmdq */
@@ -629,18 +646,19 @@ int primary_display_esd_check(void)
 	unsigned int mode;
 #endif
 /* Huaqin modify for HQ-124138 by dongtingchi at 2021/04/29 end */
+<<<<<<< HEAD
 	mmp_event mmp_te = ddp_mmp_get_events()->esd_extte;
 	mmp_event mmp_rd = ddp_mmp_get_events()->esd_rdlcm;
 	mmp_event mmp_chk = ddp_mmp_get_events()->esd_check_t;
+=======
+>>>>>>> 4ccec69
 	struct LCM_PARAMS *params;
 
 	dprec_logger_start(DPREC_LOGGER_ESD_CHECK, 0, 0);
-	mmprofile_log_ex(mmp_chk, MMPROFILE_FLAG_START, 0, 0);
 	DISPCHECK("[ESD]ESD check begin\n");
 
 	primary_display_manual_lock();
 	if (primary_get_state() == DISP_SLEPT) {
-		mmprofile_log_ex(mmp_chk, MMPROFILE_FLAG_PULSE, 1, 0);
 		DISPCHECK("[ESD]Primary DISP slept. Skip esd check\n");
 		primary_display_manual_unlock();
 		goto done;
@@ -651,7 +669,6 @@ int primary_display_esd_check(void)
 	params = primary_get_lcm()->params;
 	if (params->dsi.customization_esd_check_enable == 0) {
 		/* use TE for esd check */
-		mmprofile_log_ex(mmp_te, MMPROFILE_FLAG_START, 0, 0);
 
 /* Huaqin modify for HQ-124138 by dongtingchi at 2021/04/29 start */
 #ifndef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
@@ -674,32 +691,26 @@ int primary_display_esd_check(void)
 #endif
 /* Huaqin modify for HQ-124138 by dongtingchi at 2021/04/29 end */
 
-		mmprofile_log_ex(mmp_te, MMPROFILE_FLAG_END, 0, ret);
 
 		goto done;
 	}
 
 	/* Esd Check: Read from lcm */
-	mmprofile_log_ex(mmp_rd, MMPROFILE_FLAG_START,
-			 0, primary_display_cmdq_enabled());
-
 	if (primary_display_cmdq_enabled() == 0) {
 		DISPCHECK("[ESD]not support cpu read do esd check\n");
-		mmprofile_log_ex(mmp_rd, MMPROFILE_FLAG_END, 0, ret);
 		goto done;
 	}
-
-	mmprofile_log_ex(mmp_rd, MMPROFILE_FLAG_PULSE,
-			 0, primary_display_is_video_mode());
 
 	/* only cmd mode read & with disable mmsys clk will kick */
 	ret = do_esd_check_read();
 
-	mmprofile_log_ex(mmp_rd, MMPROFILE_FLAG_END, 0, ret);
 
 done:
 	DISPCHECK("[ESD]ESD check %s\n", ret ? "fail" : "pass");
+<<<<<<< HEAD
 	mmprofile_log_ex(mmp_chk, MMPROFILE_FLAG_END, 0, ret);
+=======
+>>>>>>> 4ccec69
 	dprec_logger_done(DPREC_LOGGER_ESD_CHECK, 0, 0);
 	return ret;
 }
@@ -709,7 +720,11 @@ static int primary_display_check_recovery_worker_kthread(void *data)
 	struct sched_param param = {.sched_priority = 87 };
 	int ret = 0;
 	int i = 0;
+<<<<<<< HEAD
 	int esd_try_cnt = 5; /* 20; */
+=======
+	int esd_try_cnt = 1; /* 20; */
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-124138 by dongtingchi at 2021/04/29 start */
 #ifndef CONFIG_MI_ERRFLAG_ESD_CHECK_ENABLE
 	int recovery_done = 0;
@@ -769,7 +784,6 @@ static int primary_display_check_recovery_worker_kthread(void *data)
 			DISPERR(
 				"[ESD]LCM recover fail. Try time:%d. Disable esd check\n",
 				esd_try_cnt);
-			primary_display_esd_check_enable(0);
 		} else if (recovery_done == 1) {
 			DISPCHECK("[ESD]esd recovery success\n");
 			recovery_done = 0;
@@ -819,11 +833,9 @@ int primary_display_esd_recovery(void)
 {
 	enum DISP_STATUS ret = DISP_STATUS_OK;
 	struct LCM_PARAMS *lcm_param = NULL;
-	mmp_event mmp_r = ddp_mmp_get_events()->esd_recovery_t;
 
 	DISPFUNC();
 	dprec_logger_start(DPREC_LOGGER_ESD_RECOVERY, 0, 0);
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_START, 0, 0);
 	DISPCHECK("[ESD]ESD recovery begin\n");
 
 /* Huaqin add for HQ-124138 by dongtingchi at 2021/04/29 start */
@@ -834,8 +846,6 @@ int primary_display_esd_recovery(void)
 /* Huaqin add for HQ-124138 by dongtingchi at 2021/04/29 end */
 
 	primary_display_manual_lock();
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE,
-		       primary_display_is_video_mode(), 1);
 
 	lcm_param = disp_lcm_get_params(primary_get_lcm());
 	if (primary_get_state() == DISP_SLEPT) {
@@ -846,25 +856,24 @@ int primary_display_esd_recovery(void)
 	/* In video mode, recovery don't need kick and blocking flush */
 	if (!primary_display_is_video_mode()) {
 		primary_display_idlemgr_kick((char *)__func__, 0);
-		mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 2);
 
 	}
 	/* blocking flush before stop trigger loop */
 	_blocking_flush();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 4ccec69
 
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 3);
 
 	DISPINFO("[ESD]display cmdq trigger loop stop[begin]\n");
 	_cmdq_stop_trigger_loop();
 	DISPINFO("[ESD]display cmdq trigger loop stop[end]\n");
 
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 4);
 
 	DISPDBG("[ESD]stop dpmgr path[begin]\n");
 	dpmgr_path_stop(primary_get_dpmgr_handle(), CMDQ_DISABLE);
 	DISPCHECK("[ESD]stop dpmgr path[end]\n");
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 0xff);
 
 	if (dpmgr_path_is_busy(primary_get_dpmgr_handle())) {
 		DISPCHECK("[ESD]primary display path is busy after stop\n");
@@ -872,13 +881,11 @@ int primary_display_esd_recovery(void)
 			DISP_PATH_EVENT_FRAME_DONE, HZ * 1);
 		DISPCHECK("[ESD]wait frame done ret:%d\n", ret);
 	}
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 5);
 
 	DISPDBG("[ESD]reset display path[begin]\n");
 	dpmgr_path_reset(primary_get_dpmgr_handle(), CMDQ_DISABLE);
 	DISPCHECK("[ESD]reset display path[end]\n");
 
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 6);
 
 	DISPDBG("[POWER]lcm suspend[begin]\n");
 	/*after dsi_stop, we should enable the dsi basic irq.*/
@@ -886,17 +893,25 @@ int primary_display_esd_recovery(void)
 	disp_lcm_suspend(primary_get_lcm());
 	DISPCHECK("[POWER]lcm suspend[end]\n");
 
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 7);
 
 	DISPDBG("[ESD]dsi power reset[begine]\n");
 	dpmgr_path_dsi_power_off(primary_get_dpmgr_handle(), NULL);
 	if (bdg_is_bdg_connected() == 1) {
+<<<<<<< HEAD
 		struct disp_ddp_path_config *data_config;
 
 		bdg_common_deinit(DISP_BDG_DSI0, NULL);
 
 
 		data_config = dpmgr_path_get_last_config(pgc->dpmgr_handle);
+=======
+		struct disp_ddp_path_config *data_config = NULL;
+
+		bdg_common_deinit(DISP_BDG_DSI0, NULL);
+
+		if (pgc != NULL)
+			data_config = dpmgr_path_get_last_config(pgc->dpmgr_handle);
+>>>>>>> 4ccec69
 		bdg_common_init(DISP_BDG_DSI0, data_config, NULL);
 		mipi_dsi_rx_mac_init(DISP_BDG_DSI0, data_config, NULL);
 	}
@@ -908,22 +923,42 @@ int primary_display_esd_recovery(void)
 	dpmgr_path_reset(primary_get_dpmgr_handle(), CMDQ_DISABLE);
 	DISPCHECK("[ESD]dsi power reset[end]\n");
 	if (bdg_is_bdg_connected() == 1) {
+<<<<<<< HEAD
 		struct disp_ddp_path_config *data_config;
+=======
+		struct disp_ddp_path_config *data_config = NULL;
+>>>>>>> 4ccec69
 
 //		extern ddp_dsi_config(enum DISP_MODULE_ENUM module,
 //		struct disp_ddp_path_config *config, void *cmdq);
 
+<<<<<<< HEAD
 		data_config = dpmgr_path_get_last_config(pgc->dpmgr_handle);
 		data_config->dst_dirty = 1;
 		dpmgr_path_config(primary_get_dpmgr_handle(), data_config, NULL);
 //		ddp_dsi_config(DISP_MODULE_DSI0, data_config, NULL);
 
 		data_config->dst_dirty = 0;
+=======
+		if (pgc != NULL)
+			data_config = dpmgr_path_get_last_config(pgc->dpmgr_handle);
+
+		if (data_config != NULL) {
+			data_config->dst_dirty = 1;
+			dpmgr_path_config(primary_get_dpmgr_handle(), data_config, NULL);
+//			ddp_dsi_config(DISP_MODULE_DSI0, data_config, NULL);
+
+			data_config->dst_dirty = 0;
+		}
+>>>>>>> 4ccec69
 	}
 	DISPDBG("[ESD]lcm recover[begin]\n");
 	disp_lcm_esd_recover(primary_get_lcm());
 	DISPCHECK("[ESD]lcm recover[end]\n");
+<<<<<<< HEAD
 	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 8);
+=======
+>>>>>>> 4ccec69
 	if (bdg_is_bdg_connected() == 1 && get_mt6382_init()) {
 		DISPCHECK("set 6382 mode start\n");
 		bdg_tx_set_mode(DISP_BDG_DSI0, NULL, get_bdg_tx_mode());
@@ -947,11 +982,9 @@ int primary_display_esd_recovery(void)
 		/* goto done; */
 	}
 
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 9);
 	DISPDBG("[ESD]start cmdq trigger loop[begin]\n");
 	_cmdq_start_trigger_loop();
 	DISPCHECK("[ESD]start cmdq trigger loop[end]\n");
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 10);
 	if (primary_display_is_video_mode()) {
 		/*
 		 * for video mode, we need to force trigger here
@@ -962,7 +995,6 @@ int primary_display_esd_recovery(void)
 			CMDQ_DISABLE);
 
 	}
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_PULSE, 0, 11);
 
 	/*
 	 * (in suspend) when we stop trigger loop
@@ -985,7 +1017,6 @@ int primary_display_esd_recovery(void)
 done:
 	primary_display_manual_unlock();
 	DISPCHECK("[ESD]ESD recovery end\n");
-	mmprofile_log_ex(mmp_r, MMPROFILE_FLAG_END, 0, 0);
 	dprec_logger_done(DPREC_LOGGER_ESD_RECOVERY, 0, 0);
 
 /* Huaqin add for HQ-124138 by dongtingchi at 2021/04/29 start */
@@ -1141,8 +1172,6 @@ static unsigned int extd_need_do_esd_check(void)
 /* For external display EXT TE EINT Check */
 static irqreturn_t extd_esd_check_ext_te_irq_handler(int irq, void *data)
 {
-	mmprofile_log_ex(ddp_mmp_get_events()->esd_vdo_eint,
-		MMPROFILE_FLAG_PULSE, 0, 0);
 	atomic_set(&esd_ext_te_1_event, 1);
 	wake_up_interruptible(&esd_ext_te_1_wq);
 	return IRQ_HANDLED;
@@ -1237,13 +1266,9 @@ int external_display_esd_check(void)
 	struct disp_lcm_handle *plcm = NULL;
 
 	dprec_logger_start(DPREC_LOGGER_ESD_CHECK, 0, 0);
-	mmprofile_log_ex(ddp_mmp_get_events()->esd_check_t,
-		MMPROFILE_FLAG_START, 0, 0);
 	DISPCHECK("[EXTD-ESD]ESD check begin\n");
 
 	if (ext_disp_is_alive() != EXTD_RESUME) {
-		mmprofile_log_ex(ddp_mmp_get_events()->esd_check_t,
-			MMPROFILE_FLAG_PULSE, 1, 0);
 		DISPCHECK("[EXTD-ESD]EXTD DISP is slept. skip esd check\n");
 		goto done;
 	}
@@ -1253,14 +1278,10 @@ int external_display_esd_check(void)
 	if (!plcm || plcm->params->dsi.customization_esd_check_enable != 0)
 		goto done;
 	/* use te for esd check */
-	mmprofile_log_ex(ddp_mmp_get_events()->esd_extte,
-		MMPROFILE_FLAG_START, 0, 0);
 
 	mode = get_extd_esd_check_mode();
 	if (mode == GPIO_EINT_MODE) {
 		DISPCHECK("[EXTD-ESD]ESD check eint\n");
-		mmprofile_log_ex(ddp_mmp_get_events()->esd_extte,
-			MMPROFILE_FLAG_PULSE, ext_disp_is_video_mode(), mode);
 		external_display_switch_esd_mode(mode);
 		DISPCHECK("[EXTD-ESD]ESD check begin ~\n");
 		ret = extd_esd_check_eint();
@@ -1268,21 +1289,14 @@ int external_display_esd_check(void)
 		mode = GPIO_DSI_MODE; /* used for mode switch */
 		external_display_switch_esd_mode(mode);
 	} else if (mode == GPIO_DSI_MODE) {
-		mmprofile_log_ex(ddp_mmp_get_events()->esd_extte,
-			MMPROFILE_FLAG_PULSE, ext_disp_is_video_mode(), mode);
 
 		DISPCHECK("[EXTD-ESD]ESD check read\n");
 		/*ret = do_esd_check_read();*/
 		mode = GPIO_EINT_MODE; /* used for mode switch */
 	}
 
-	mmprofile_log_ex(ddp_mmp_get_events()->esd_extte,
-		MMPROFILE_FLAG_END, 0, ret);
-
 done:
 	DISPCHECK("[EXTD-ESD]ESD check end, ret = %d\n", ret);
-	mmprofile_log_ex(ddp_mmp_get_events()->esd_check_t,
-		MMPROFILE_FLAG_END, 0, ret);
 	dprec_logger_done(DPREC_LOGGER_ESD_CHECK, 0, 0);
 	return ret;
 

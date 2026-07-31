@@ -64,6 +64,10 @@ unsigned int bdg_tx_mode;
 static int bdg_eint_irq;
 static int mt6382_connected;
 static bool irq_already_requested;
+<<<<<<< HEAD
+=======
+static int bdg_mipi_hopping;
+>>>>>>> 4ccec69
 
 #define T_DCO		5  // nominal: 200MHz
 int hsrx_clk_div;
@@ -95,9 +99,28 @@ struct lcm_setting_table {
 	unsigned char count;
 	unsigned char para_list[256];
 };
+<<<<<<< HEAD
 /* Huaqin modify for HQ-150314 by caogaojie at 2021/08/13 start */
 #define MM_CLK			270 //fpga=26
 /* Huaqin modify for HQ-150314 by caogaojie at 2021/08/13 end */
+=======
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+int mtk_mm_clk = 0;
+int mtk_rxtx_ratio = 0;
+extern char *saved_command_line;
+int mtk_panel_compare(void)
+{
+    if (strstr(saved_command_line, "dsi_panel_k19a_43_02_0b_dsc_vdo_lcm_drv")) {
+        mtk_mm_clk = 405;
+        mtk_rxtx_ratio = 232;
+    } else {
+	mtk_mm_clk = 270;
+        mtk_rxtx_ratio = 225;
+    }
+    return 0;
+}
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 #define NS_TO_CYCLE(n, c)	((n) / (c) + (((n) % (c)) ? 1 : 0))
 
 #define DSI_MODULE_to_ID(x)	(x == DISP_BDG_DSI0 ? 0 : 1)
@@ -144,7 +167,14 @@ int mtk_spi_mask_write(u32 addr, u32 msk, u32 value)
 		if ((msk & temp) == temp)
 			break;
 	}
+<<<<<<< HEAD
 	value = value << i;
+=======
+	if (i == 32)
+		value = 0;
+	else
+		value = value << i;
+>>>>>>> 4ccec69
 //	DISPMSG("mt6382, %s, i=%02d, temp=0x%08x, addr=0x%08x, msk=0x%08x, value=0x%x\n",
 //		__func__, i, temp, addr, msk, value);
 #ifdef SW_EARLY_PORTING
@@ -164,7 +194,14 @@ int mtk_spi_mask_field_write(u32 addr, u32 msk, u32 value)
 		if ((msk & temp) == temp)
 			break;
 	}
+<<<<<<< HEAD
 	value = value << i;
+=======
+	if (i == 32)
+		value = 0;
+	else
+		value = value << i;
+>>>>>>> 4ccec69
 //	DISPMSG("mt6382, %s, i=%02d, temp=0x%08x, addr=0x%08x, msk=0x%08x, value=0x%x\n",
 //		__func__, i, temp, addr, msk, value);
 #ifdef SW_EARLY_PORTING
@@ -241,17 +278,32 @@ do { \
 int bdg_is_bdg_connected(void)
 {
 	if (mt6382_connected == 0) {
+<<<<<<< HEAD
 		unsigned int ret = 0;
 #ifdef CONFIG_MTK_MT6382_BDG
 		spislv_init();
 		spislv_switch_speed_hz(SPI_TX_LOW_SPEED_HZ, SPI_RX_LOW_SPEED_HZ);
 		ret = mtk_spi_read(0x0);
 #endif
+=======
+#ifdef CONFIG_MTK_MT6382_BDG
+		unsigned int ret = 0;
+
+		spislv_init();
+		spislv_switch_speed_hz(SPI_TX_LOW_SPEED_HZ, SPI_RX_LOW_SPEED_HZ);
+		ret = mtk_spi_read(0x0);
+>>>>>>> 4ccec69
 
 		if (ret == 0)
 			mt6382_connected = -1;
 		else
 			mt6382_connected = 1;
+<<<<<<< HEAD
+=======
+#else
+		mt6382_connected = -1;
+#endif
+>>>>>>> 4ccec69
 	}
 
 	DISPMSG("%s, mt6382_connected=%d\n", __func__, mt6382_connected);
@@ -532,11 +584,33 @@ void ana_macro_on(void *cmdq)
 	 * bit 16-17 is display mm clk 1(270m)/2(405m)/3(540m)
 	 * dsc_on:vact * hact * vrefresh * (vtotal / vact) * bubble_ratio
 	 */
+<<<<<<< HEAD
 #ifdef _90HZ_
 	reg = (3 << 24) | (1 << 16) | (1 << 8) | (1 << 0); //270M for 90Hz
 #else
 	reg = (3 << 24) | (2 << 16) | (1 << 8) | (1 << 0); //405M for 120Hz
 #endif
+=======
+	// erabye - K19S-31 append
+	switch (mtk_mm_clk) {
+	case 546:
+		DISPMSG("%s, 6382 mmclk 546M\n", __func__);
+		reg = (3 << 24) | (3 << 16) | (1 << 8) | (1 << 0); //540M
+		break;
+	case 405:
+		DISPMSG("%s, 6382 mmclk 405M\n", __func__);
+		reg = (3 << 24) | (2 << 16) | (1 << 8) | (1 << 0); //405M for 120Hz
+		break;
+	case 270:
+		DISPMSG("%s, 6382 mmclk 270M\n", __func__);
+		reg = (3 << 24) | (1 << 16) | (1 << 8) | (1 << 0); //270M for 90Hz
+		break;
+	default:
+		DISPMSG("%s, 6382 mmclk default 546M\n", __func__);
+		reg = (3 << 24) | (3 << 16) | (1 << 8) | (1 << 0); //540M
+		break;
+	}
+>>>>>>> 4ccec69
 
 	DSI_OUTREG32(cmdq, TOPCKGEN->CLK_CFG_0_SET, reg);
 	//config update
@@ -824,7 +898,11 @@ int bdg_mipi_tx_dphy_clk_setting(enum DISP_BDG_ENUM module,
 				 void *cmdq,
 				 struct LCM_DSI_PARAMS *dsi_params)
 {
+<<<<<<< HEAD
 	int i = 0;
+=======
+	unsigned int i = 0;
+>>>>>>> 4ccec69
 	unsigned int j = 0;
 	unsigned int data_Rate;
 //	unsigned int pll_clock;
@@ -1129,9 +1207,15 @@ int bdg_mipi_tx_dphy_clk_setting(enum DISP_BDG_ENUM module,
 }
 
 int bdg_tx_phy_config(enum DISP_BDG_ENUM module,
+<<<<<<< HEAD
 			void *cmdq, struct LCM_DSI_PARAMS *tx_params)
 {
 	int i;
+=======
+			void *cmdq, unsigned int tx_data_rate)
+{
+	unsigned int i;
+>>>>>>> 4ccec69
 	u32 ui, cycle_time;
 	unsigned int hs_trail;
 //	unsigned char timcon_temp;
@@ -1358,11 +1442,19 @@ int bdg_tx_phy_config(enum DISP_BDG_ENUM module,
 int bdg_tx_txrx_ctrl(enum DISP_BDG_ENUM module,
 			void *cmdq, struct LCM_DSI_PARAMS *tx_params)
 {
+<<<<<<< HEAD
 	int i;
 	int lane_num = tx_params->LANE_NUM;
 	bool hstx_cklp_en = tx_params->cont_clock ? FALSE : TRUE;
 	bool dis_eotp_en = tx_params->IsCphy ? TRUE : FALSE;
 	bool ext_te_en = tx_params->mode ? FALSE : TRUE;
+=======
+	unsigned int i;
+	int lane_num = tx_params->LANE_NUM;
+	bool hstx_cklp_en = tx_params->cont_clock ? FALSE : TRUE;
+	bool dis_eotp_en = tx_params->IsCphy ? TRUE : FALSE;
+	bool ext_te_en = (tx_params->mode != CMD_MODE) ? FALSE : TRUE;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1404,7 +1496,11 @@ int bdg_tx_txrx_ctrl(enum DISP_BDG_ENUM module,
 int bdg_tx_ps_ctrl(enum DISP_BDG_ENUM module,
 			void *cmdq, struct LCM_DSI_PARAMS *tx_params)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 	unsigned int ps_wc, width, bpp, ps_sel;
 
 	DISPFUNCSTART();
@@ -1471,7 +1567,13 @@ int bdg_tx_ps_ctrl(enum DISP_BDG_ENUM module,
 int bdg_tx_vdo_timing_set(enum DISP_BDG_ENUM module,
 			void *cmdq, struct LCM_DSI_PARAMS *tx_params)
 {
+<<<<<<< HEAD
 	int i;
+=======
+/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 start */
+	unsigned int i,j;
+/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 end */
+>>>>>>> 4ccec69
 /* Huaqin modify for HQ-146521 by caogaojie at 2021/08/02 start */
 	u32 dsi_buf_bpp = 0, data_init_byte = 0;
 /* Huaqin modify for HQ-146521 by caogaojie at 2021/08/02 end */
@@ -1561,7 +1663,21 @@ int bdg_tx_vdo_timing_set(enum DISP_BDG_ENUM module,
 					(tx_params->vertical_backporch));
 		DSI_OUTREG32(cmdq, TX_REG[i]->DSI_TX_VFP_NL,
 					(tx_params->vertical_frontporch));
+<<<<<<< HEAD
 
+=======
+/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 start */
+#ifdef CONFIG_MTK_HIGH_FRAME_RATE
+		for (j = 0; j < DFPS_LEVELS; j++) {
+			if (tx_params->dfps_params[j].fps == 9000) {
+				DSI_OUTREG32(cmdq, TX_REG[i]->DSI_TX_VFP_NL,
+					(tx_params->dfps_params[j].vertical_frontporch));
+				break;
+			}
+		}
+#endif
+/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 end */
+>>>>>>> 4ccec69
 		DSI_OUTREG32(cmdq, TX_REG[i]->DSI_TX_HSA_WC, hsa_byte);
 		DSI_OUTREG32(cmdq, TX_REG[i]->DSI_TX_HBP_WC, hbp_byte);
 		DSI_OUTREG32(cmdq, TX_REG[i]->DSI_TX_HFP_WC, hfp_byte);
@@ -1574,7 +1690,11 @@ int bdg_tx_vdo_timing_set(enum DISP_BDG_ENUM module,
 int bdg_tx_buf_rw_set(enum DISP_BDG_ENUM module,
 			void *cmdq, struct LCM_DSI_PARAMS *tx_params)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 	unsigned int width, height, rw_times, tmp;
 
 	DISPFUNCSTART();
@@ -1623,7 +1743,11 @@ int bdg_tx_buf_rw_set(enum DISP_BDG_ENUM module,
 int bdg_tx_enable_hs_clk(enum DISP_BDG_ENUM module,
 				void *cmdq, bool enable)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1676,7 +1800,11 @@ int dsi_set_fps(lcm_dsi_params *dsi_params, enum dsi_fps_enum fps)
 int bdg_tx_set_mode(enum DISP_BDG_ENUM module,
 				void *cmdq, unsigned int mode)
 {
+<<<<<<< HEAD
 	int i = 0;
+=======
+	unsigned int i = 0;
+>>>>>>> 4ccec69
 
 	DISPINFO("%s, mode=%d\n", __func__, mode);
 	for (i = DSI_MODULE_BEGIN(module); i <= DSI_MODULE_END(module); i++) {
@@ -1698,7 +1826,11 @@ int bdg_tx_bist_pattern(enum DISP_BDG_ENUM module,
 				unsigned int red, unsigned int green,
 				unsigned int blue)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1732,7 +1864,11 @@ int bdg_tx_bist_pattern(enum DISP_BDG_ENUM module,
 
 int bdg_tx_start(enum DISP_BDG_ENUM module, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1751,7 +1887,11 @@ int bdg_tx_start(enum DISP_BDG_ENUM module, void *cmdq)
 
 int bdg_tx_clr_sta(enum DISP_BDG_ENUM module, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1782,7 +1922,11 @@ int bdg_set_dcs_read_cmd(bool enable, void *cmdq)
 
 int bdg_tx_stop(enum DISP_BDG_ENUM module, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1795,7 +1939,11 @@ int bdg_tx_stop(enum DISP_BDG_ENUM module, void *cmdq)
 
 int bdg_tx_reset(enum DISP_BDG_ENUM module, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1812,7 +1960,11 @@ int bdg_tx_reset(enum DISP_BDG_ENUM module, void *cmdq)
 int bdg_vm_mode_set(enum DISP_BDG_ENUM module, bool enable,
 			unsigned int long_pkt, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	for (i = DSI_MODULE_BEGIN(module); i <= DSI_MODULE_END(module); i++) {
 		if (enable) {
@@ -1833,7 +1985,11 @@ int bdg_vm_mode_set(enum DISP_BDG_ENUM module, bool enable,
 
 int bdg_tx_cmd_mode(enum DISP_BDG_ENUM module, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -1860,6 +2016,10 @@ int bdg_mutex_trigger(enum DISP_BDG_ENUM module, void *cmdq)
 
 int bdg_dsi_dump_reg(enum DISP_BDG_ENUM module, unsigned int level)
 {
+<<<<<<< HEAD
+=======
+#if 0
+>>>>>>> 4ccec69
 	unsigned int i, k, tmp;
 
 //	DISPFUNCSTART();
@@ -1875,6 +2035,11 @@ int bdg_dsi_dump_reg(enum DISP_BDG_ENUM module, unsigned int level)
 		unsigned long dsc_base_addr = (unsigned long)DSC_REG;
 		unsigned long dsi_base_addr = (unsigned long)TX_REG[i];
 		unsigned long mipi_base_addr = (unsigned long)MIPI_TX_REG;
+<<<<<<< HEAD
+=======
+		unsigned long rx_base_addr = (unsigned long)DSI2_REG;
+		unsigned long rx_phy_base_addr = (unsigned long)MIPI_RX_PHY_BASE;
+>>>>>>> 4ccec69
 
 		DISPMSG("========================== mt6382 RX REGS ==\n", i);
 		tmp = mtk_spi_read(0x0000d00c);
@@ -1903,11 +2068,38 @@ int bdg_dsi_dump_reg(enum DISP_BDG_ENUM module, unsigned int level)
 			if (tmp & (1 << 22))
 				DISPMSG("INT_ST_MAIN(bit%d), int_st_rx_triggers\n", (1 << 22));
 		}
+<<<<<<< HEAD
 
 		DISPMSG("========================== mt6382 DSI%d REGS ==\n", i);
 //		for (k = 0; k < sizeof(struct BDG_TX_REGS); k += 16) {
 		for (k = 0; k < 0x210; k += 16) {
 			DISPMSG("0x%08x: 0x%08x 0x%08x 0x%08x 0x%08x\n", k,
+=======
+		if (level > 2) {
+			DISPMSG("========================== mt6382 RX Full REGS ==\n");
+	//		for (k = 0; k < sizeof(struct BDG_TX_REGS); k += 16) {
+			for (k = 0; k < 0x210; k += 16) {
+				DISPMSG("0x%08x: 0x%08x 0x%08x 0x%08x 0x%08x\n", rx_base_addr + k,
+					mtk_spi_read(rx_base_addr + k),
+					mtk_spi_read(rx_base_addr + k + 0x4),
+					mtk_spi_read(rx_base_addr + k + 0x8),
+					mtk_spi_read(rx_base_addr + k + 0xc));
+			}
+			DISPMSG("========================== mt6382 RX PHY REGS ==\n");
+	//		for (k = 0; k < sizeof(struct BDG_TX_REGS); k += 16) {
+			for (k = 12288; k < 0x15440; k += 16) {
+				DISPMSG("0x%08x: 0x%08x 0x%08x 0x%08x 0x%08x\n", k / 4,
+					mtk_spi_read(rx_phy_base_addr + k),
+					mtk_spi_read(rx_phy_base_addr + k + 0x4),
+					mtk_spi_read(rx_phy_base_addr + k + 0x8),
+					mtk_spi_read(rx_phy_base_addr + k + 0xc));
+			}
+		}
+		DISPMSG("========================== mt6382 DSI%d REGS ==\n", i);
+//		for (k = 0; k < sizeof(struct BDG_TX_REGS); k += 16) {
+		for (k = 0; k < 0x4f0; k += 16) {
+			DISPMSG("0x%08x: 0x%08x 0x%08x 0x%08x 0x%08x\n", dsi_base_addr + k,
+>>>>>>> 4ccec69
 				mtk_spi_read(dsi_base_addr + k),
 				mtk_spi_read(dsi_base_addr + k + 0x4),
 				mtk_spi_read(dsi_base_addr + k + 0x8),
@@ -1947,13 +2139,21 @@ int bdg_dsi_dump_reg(enum DISP_BDG_ENUM module, unsigned int level)
 		}
 	}
 
+<<<<<<< HEAD
+=======
+#endif
+>>>>>>> 4ccec69
 	return 0;
 }
 
 
 int bdg_tx_wait_for_idle(enum DISP_BDG_ENUM module)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 	unsigned int timeout = 5000; /* unit: usec */
 	unsigned int status;
 
@@ -1990,12 +2190,20 @@ int ap_tx_phy_config(enum DISP_BDG_ENUM module,
 int bdg_dsi_line_timing_dphy_setting(enum DISP_BDG_ENUM module,
 			void *cmdq, struct LCM_DSI_PARAMS *tx_params)
 {
+<<<<<<< HEAD
+=======
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+>>>>>>> 4ccec69
 	unsigned int width, height, lanes, ps_wc, new_hfp_byte;
 	unsigned int bg_tx_total_word_cnt = 0;
 	unsigned int bg_tx_line_time = 0, disp_pipe_line_time = 0;
 	unsigned int rxtx_ratio = 0;
 //	unsigned int ap_tx_total_word_cnt = 0, ap_tx_total_word_cnt_no_hfp_wc = 0;
 
+<<<<<<< HEAD
+=======
+	mtk_panel_compare();
+>>>>>>> 4ccec69
 	DISPFUNCSTART();
 	width = tx_params->horizontal_active_pixel / 1;
 	height = tx_params->vertical_active_line;
@@ -2006,12 +2214,20 @@ int bdg_dsi_line_timing_dphy_setting(enum DISP_BDG_ENUM module,
 	if (dsc_en) {
 //		ps_wc = width;
 		ps_wc = width * 24 / 8 / 3;	/* for 8bpp, 1/3 compression */
+<<<<<<< HEAD
 		rxtx_ratio = RXTX_RATIO;	/* ratio=2.30 */
+=======
+		rxtx_ratio = mtk_rxtx_ratio;        /* ratio=2.30 */
+>>>>>>> 4ccec69
 	} else {
 		ps_wc = width * 24 / 8;	/* for 8bpp, 1/3 compression */
 		rxtx_ratio = 100;
 	}
 	new_hfp_byte = hfp_byte;
+<<<<<<< HEAD
+=======
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 
 	DISPMSG("%s, dsc_en=%d, hsa_byte=%d, hbp_byte=%d\n",
 		__func__, dsc_en, hsa_byte, hbp_byte);
@@ -2059,7 +2275,13 @@ int bdg_dsi_line_timing_dphy_setting(enum DISP_BDG_ENUM module,
 	bg_tx_line_cycle = (bg_tx_total_word_cnt + (lanes - 1)) / lanes;
 	bg_tx_line_time = bg_tx_line_cycle * 8000 / tx_data_rate;
 
+<<<<<<< HEAD
 	disp_pipe_line_time = width * 1000 / MM_CLK;
+=======
+	/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+	disp_pipe_line_time = width * 1000 / mtk_mm_clk;
+	/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 
 	DISPMSG("bg_tx_total_word_cnt=%d, bg_tx_line_cycle=%d\n",
 		bg_tx_total_word_cnt, bg_tx_line_cycle);
@@ -2206,6 +2428,7 @@ unsigned int get_bdg_tx_mode(void)
 	return bdg_tx_mode;
 }
 
+<<<<<<< HEAD
 #define DELAY_US 1
 void mt6382_nt36672c_fhd_vdo_init(bool dsc_on)
 {
@@ -3518,6 +3741,8 @@ void mt6382_nt36672c_fhd_vdo_init(bool dsc_on)
 	DISPFUNCEND();
 }
 
+=======
+>>>>>>> 4ccec69
 void dbg_set_cmdq_V2(enum DISP_BDG_ENUM module, void *cmdq,
 			unsigned int cmd, unsigned char count,
 		     unsigned char *para_list, unsigned char force_update)
@@ -3657,7 +3882,11 @@ int bdg_tx_init(enum DISP_BDG_ENUM module,
 	ret |= bdg_mipi_tx_dphy_clk_setting(module, cmdq, tx_params);
 	udelay(20);
 
+<<<<<<< HEAD
 	ret |= bdg_tx_phy_config(module, cmdq, tx_params);
+=======
+	ret |= bdg_tx_phy_config(module, cmdq, tx_data_rate);
+>>>>>>> 4ccec69
 	ret |= bdg_tx_txrx_ctrl(module, cmdq, tx_params);
 	ret |= bdg_tx_ps_ctrl(module, cmdq, tx_params);
 	ret |= bdg_tx_vdo_timing_set(module, cmdq, tx_params);
@@ -3679,7 +3908,11 @@ int bdg_tx_init(enum DISP_BDG_ENUM module,
 
 int bdg_tx_deinit(enum DISP_BDG_ENUM module, void *cmdq)
 {
+<<<<<<< HEAD
 	int i;
+=======
+	unsigned int i;
+>>>>>>> 4ccec69
 
 	DISPFUNCSTART();
 
@@ -4000,7 +4233,11 @@ int polling_status(void)
 
 	if (timeout == 0) {
 		DISPMSG("%s, wait timeout!\n", __func__);
+<<<<<<< HEAD
 		bdg_dsi_dump_reg(DISP_BDG_DSI0, 0);
+=======
+		//bdg_dsi_dump_reg(DISP_BDG_DSI0, 0);
+>>>>>>> 4ccec69
 		return -1;
 	}
 
@@ -4454,12 +4691,21 @@ int mipi_dsi_rx_mac_init(enum DISP_BDG_ENUM module,
 	DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_RDY_TO_CNT_OS, 0);
 	DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_RESP_TO_CNT_OS, 0);
 	DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_VALID_VC_CFG_OS, 0xf);
+<<<<<<< HEAD
 	/* 0x1b for MMCLK 270M 0x37 for MMCLK 407M */
 #ifdef _90HZ_
 	DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_CLK_MGR_CFG_OS, 0x1b);
 #else
 	DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_CLK_MGR_CFG_OS, 0x37);
 #endif
+=======
+	/* 0x1b for MMCLK 270M 0x37 for MMCLK 405M */
+	// erabye - K19S-31 append
+	if (mtk_mm_clk == 270)
+		DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_CLK_MGR_CFG_OS, 0x1b);
+	else
+		DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_DDI_CLK_MGR_CFG_OS, 0x37);
+>>>>>>> 4ccec69
 //	}
 
 	//video mode/ipi
@@ -4468,10 +4714,17 @@ int mipi_dsi_rx_mac_init(enum DISP_BDG_ENUM module,
 
 		if (ipi_mode_qst)
 			DSI_OUTREG32(cmdq, DSI2_REG->DSI2_DEVICE_IPI_MODE_CFG_OS, 1);
+<<<<<<< HEAD
 
 		t_ipi_clk  = 1000 / MM_CLK;
 		//t_hact_ipi = frame_width * t_ipi_clk;
 		t_hact_ipi = frame_width * 1000 / MM_CLK;
+=======
+	/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+		t_ipi_clk  = 1000 / mtk_mm_clk;
+		//t_hact_ipi = frame_width * t_ipi_clk;
+		t_hact_ipi = frame_width * 1000 / mtk_mm_clk;
+>>>>>>> 4ccec69
 		if (tx_params->IsCphy) { //c-phy
 			temp = 7000;
 			t_ppi_clk = temp / ap_tx_data_rate;
@@ -4488,6 +4741,7 @@ int mipi_dsi_rx_mac_init(enum DISP_BDG_ENUM module,
 
 		if (t_hact_ppi > t_hact_ipi)
 //ipi_tx_delay_qst = ((t_hact_ppi - t_hact_ipi) / t_ipi_clk + 20 * (t_ppi_clk / t_ipi_clk) + 4);
+<<<<<<< HEAD
 //ipi_tx_delay_qst = ((t_hact_ppi - t_hact_ipi) * MM_CLK / 1000 + 20 *
 //(temp * MM_CLK / tx_data_rate / 1000) + 4);
 			ipi_tx_delay_qst = ((t_hact_ppi - t_hact_ipi) * MM_CLK +
@@ -4495,6 +4749,15 @@ int mipi_dsi_rx_mac_init(enum DISP_BDG_ENUM module,
 		else
 		//ipi_tx_delay_qst =  (20 * (temp * MM_CLK / tx_data_rate / 1000) + 4);
 			ipi_tx_delay_qst =  20 * temp * MM_CLK /
+=======
+//ipi_tx_delay_qst = ((t_hact_ppi - t_hact_ipi) * mtk_mm_clk / 1000 + 20 *
+//(temp * mtk_mm_clk / tx_data_rate / 1000) + 4);
+			ipi_tx_delay_qst = ((t_hact_ppi - t_hact_ipi) * mtk_mm_clk +
+					20 * temp * mtk_mm_clk / ap_tx_data_rate) / 1000 + 4;
+		else
+		//ipi_tx_delay_qst =  (20 * (temp * mtk_mm_clk / tx_data_rate / 1000) + 4);
+			ipi_tx_delay_qst =  20 * temp * mtk_mm_clk /
+>>>>>>> 4ccec69
 				ap_tx_data_rate / 1000 + 4;
 
 		DISPINFO("ap_tx_data_rate=%d, temp=%d, t_ppi_clk=%d, t_ipi_clk=%d\n",
@@ -4502,7 +4765,12 @@ int mipi_dsi_rx_mac_init(enum DISP_BDG_ENUM module,
 		DISPINFO("t_hact_ppi=%d, t_hact_ipi=%d\n", t_hact_ppi, t_hact_ipi);
 
 		//t_ipi_tx_delay = ipi_tx_delay_qst_i * t_ipi_clk;
+<<<<<<< HEAD
 		t_ipi_tx_delay = ipi_tx_delay_qst * 1000 / MM_CLK;
+=======
+		t_ipi_tx_delay = ipi_tx_delay_qst * 1000 / mtk_mm_clk;
+	/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 
 		DISPINFO("ipi_tx_delay_qst=%d, t_ipi_tx_delay=%d\n",
 			ipi_tx_delay_qst, t_ipi_tx_delay);
@@ -5679,7 +5947,11 @@ void output_debug_signal(void)
 	//GPIO Mode
 	mtk_spi_write(0x00007300, 0x77701111);
 #endif
+<<<<<<< HEAD
 	mtk_spi_write(0x00007310, 0x11111111);
+=======
+	mtk_spi_write(0x00007310, 0x31111111);
+>>>>>>> 4ccec69
 
 }
 void bdg_first_init(void)
@@ -5728,8 +6000,14 @@ int bdg_common_init(enum DISP_BDG_ENUM module,
 	struct LCM_DSI_PARAMS *tx_params;
 
 	DISPFUNCSTART();
+<<<<<<< HEAD
  	clk_buf_disp_ctrl(true);
 	mdelay(1);
+=======
+	mtk_panel_compare();
+ 	clk_buf_disp_ctrl(true);
+	mdelay(2);
+>>>>>>> 4ccec69
 	bdg_tx_pull_6382_reset_pin();
 	mdelay(3);
 	spislv_init();
@@ -5833,6 +6111,11 @@ int bdg_common_init(enum DISP_BDG_ENUM module,
 
 	// request eint irq
 //	bdg_request_eint_irq();
+<<<<<<< HEAD
+=======
+	if (bdg_mipi_hopping)
+		bdg_mipi_clk_change_for_resume(0, 1);
+>>>>>>> 4ccec69
 
 	DISPFUNCEND();
 
@@ -5868,6 +6151,10 @@ int bdg_common_init_for_rx_pat(enum DISP_BDG_ENUM module,
 	struct LCM_DSI_PARAMS *tx_params;
 
 	DISPFUNCSTART();
+<<<<<<< HEAD
+=======
+	mtk_panel_compare();
+>>>>>>> 4ccec69
 
 	DISPSYS_REG = (struct BDG_DISPSYS_CONFIG_REGS *)DISPSYS_BDG_MMSYS_CONFIG_BASE;
 	DSI2_REG = (struct BDG_MIPIDSI2_REGS *)DISPSYS_BDG_MIPIDSI2_DEVICE_BASE;
@@ -5946,7 +6233,12 @@ int bdg_common_init_for_rx_pat(enum DISP_BDG_ENUM module,
 	// DSI-TX setting
 	bdg_tx_init(module, config, NULL);
 	/* panel init*/
+<<<<<<< HEAD
 	bdg_lcm_init(pgc->plcm, 1);
+=======
+	if (pgc != NULL)
+		bdg_lcm_init(pgc->plcm, 1);
+>>>>>>> 4ccec69
 	bdg_tx_set_mode(module, cmdq, tx_params->mode);
 
 	DSI_OUTREG32(cmdq, TX_REG[0]->DSI_RESYNC_CON, 0x50007);
@@ -6229,12 +6521,21 @@ int bdg_mipi_clk_change(int msg, int en)
 		dsi_hbp = 0x38;
 	}
 
+<<<<<<< HEAD
+=======
+	bdg_mipi_hopping = en;
+
+>>>>>>> 4ccec69
 	/* wait 6382 dsi revsync state */
 	polling_status();
 
 	/* change mipi clk & hbp porch params*/
 	bdg_dsi_mipi_clk_change(DISP_BDG_DSI0, NULL, data_rate);
 	bdg_dsi_porch_setting(DISP_BDG_DSI0, NULL, dsi_hbp);
+<<<<<<< HEAD
+=======
+	bdg_tx_phy_config(DISP_BDG_DSI0, NULL, data_rate);
+>>>>>>> 4ccec69
 
 	/* mipi clk setting need 28us */
 	udelay(28);
@@ -6242,3 +6543,26 @@ int bdg_mipi_clk_change(int msg, int en)
 	return 0;
 }
 
+<<<<<<< HEAD
+=======
+int bdg_mipi_clk_change_for_resume(int msg, int en)
+{
+	unsigned int data_rate = 0;
+	unsigned int dsi_hbp = 0; /* adaptive HBP value */
+
+	if (en) {
+		data_rate = 749;
+		dsi_hbp = 0x20;
+	} else {
+		data_rate = 760;
+		dsi_hbp = 0x38;
+	}
+
+	/* change mipi clk & hbp porch params*/
+	bdg_dsi_mipi_clk_change(DISP_BDG_DSI0, NULL, data_rate);
+	bdg_dsi_porch_setting(DISP_BDG_DSI0, NULL, dsi_hbp);
+	bdg_tx_phy_config(DISP_BDG_DSI0, NULL, data_rate);
+
+	return 0;
+}
+>>>>>>> 4ccec69

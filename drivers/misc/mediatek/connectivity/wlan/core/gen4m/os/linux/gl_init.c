@@ -4588,7 +4588,13 @@ static int32_t wlanOnAtReset(void)
 		ADAPTER_START_FAIL,
 		NET_REGISTER_FAIL,
 		PROC_INIT_FAIL,
+<<<<<<< HEAD
 		FAIL_MET_INIT_PROCFS,
+=======
+#if (CFG_MET_PACKET_TRACE_SUPPORT == 1)
+		FAIL_MET_INIT_PROCFS,
+#endif
+>>>>>>> 4ccec69
 		FAIL_REASON_NUM
 	} eFailReason = FAIL_REASON_NUM;
 
@@ -4761,7 +4767,13 @@ static int32_t wlanProbe(void *pvData, void *pvDriverData)
 		ADAPTER_START_FAIL,
 		NET_REGISTER_FAIL,
 		PROC_INIT_FAIL,
+<<<<<<< HEAD
 		FAIL_MET_INIT_PROCFS,
+=======
+#if (CFG_MET_PACKET_TRACE_SUPPORT == 1)
+		FAIL_MET_INIT_PROCFS,
+#endif
+>>>>>>> 4ccec69
 		FAIL_BY_RESET,
 		FAIL_REASON_NUM
 	} eFailReason;
@@ -4980,8 +4992,15 @@ static int32_t wlanProbe(void *pvData, void *pvDriverData)
 		       eFailReason);
 		switch (eFailReason) {
 		case FAIL_BY_RESET:
+<<<<<<< HEAD
 		case FAIL_MET_INIT_PROCFS:
 			kalMetRemoveProcfs();
+=======
+#if (CFG_MET_PACKET_TRACE_SUPPORT == 1)
+		case FAIL_MET_INIT_PROCFS:
+			kalMetRemoveProcfs();
+#endif
+>>>>>>> 4ccec69
 		case PROC_INIT_FAIL:
 			wlanNetUnregister(prWdev);
 		case NET_REGISTER_FAIL:
@@ -5390,7 +5409,11 @@ static int initWlan(void)
 #if (CFG_CHIP_RESET_SUPPORT)
 	glResetInit(prGlueInfo);
 #endif
+<<<<<<< HEAD
 	kalNotifierReg(prGlueInfo);
+=======
+	kalFbNotifierReg(prGlueInfo);
+>>>>>>> 4ccec69
 	wlanRegisterNetdevNotifier();
 
 #ifdef CONFIG_MTK_CONNSYS_DEDICATED_LOG_PATH
@@ -5444,7 +5467,11 @@ static void exitWlan(void)
 	DBGLOG(INIT, INFO, "Free wlan device..\n");
 	wlanFreeNetDev();
 #endif
+<<<<<<< HEAD
 	kalNotifierUnReg();
+=======
+	kalFbNotifierUnReg();
+>>>>>>> 4ccec69
 	wlanUnregisterNetdevNotifier();
 
 	/* printk("remove %p\n", wlanRemove); */

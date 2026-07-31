@@ -45,6 +45,7 @@
 #include "ddp_clkmgr.h"
 #include "primary_display.h"
 
+
 #if defined(CONFIG_MTK_SMI_EXT)
 #include <smi_public.h>
 #endif
@@ -304,6 +305,7 @@ static const char *_dsi_vdo_mode_parse_state(unsigned int state)
 
 enum DSI_STATUS DSI_DumpRegisters(enum DISP_MODULE_ENUM module, int level)
 {
+#if 0
 	u32 i = 0;
 	u32 k = 0;
 
@@ -386,7 +388,7 @@ enum DSI_STATUS DSI_DumpRegisters(enum DISP_MODULE_ENUM module, int level)
 #endif
 		}
 	}
-
+#endif
 	return DSI_STATUS_OK;
 }
 
@@ -877,7 +879,13 @@ int ddp_dsi_porch_setting(enum DISP_MODULE_ENUM module, void *handle,
 		if (type == DSI_VFP) {
 			DISPINFO("set dsi%d vfp to %d\n", i, value);
 			DSI_OUTREG32(handle, &DSI_REG[i]->DSI_VFP_NL, value);
+<<<<<<< HEAD
 			if (bdg_is_bdg_connected() == 1)
+=======
+		/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 start */
+			if (pgc->vfp_chg_sync_bdg && bdg_is_bdg_connected() == 1)
+		/* Huaqin modify for HQ-179522 by jiangyue at 2022/01/24 end */
+>>>>>>> 4ccec69
 				ddp_dsi_set_bdg_porch_setting(module, handle, value);
 		/* Huaqin modify for HQ-141505 by caogaojie at 2021/06/18 start */
 			if(value == 54){
@@ -947,10 +955,20 @@ static void DSI_Get_Porch_Addr(enum DISP_MODULE_ENUM module,
 	}
 }
 
+<<<<<<< HEAD
 void DSI_Config_VDO_Timing_with_DSC(enum DISP_MODULE_ENUM module,
 	struct cmdqRecStruct *cmdq, struct LCM_DSI_PARAMS *dsi_params)
 {
 	int i = 0;
+=======
+/* Huaqin add for K19S-31 by jiangyue at 2022/01/14 start */
+extern int mtk_rxtx_ratio;
+/* Huaqin add for K19S-31 by jiangyue at 2022/01/14 end */
+void DSI_Config_VDO_Timing_with_DSC(enum DISP_MODULE_ENUM module,
+	struct cmdqRecStruct *cmdq, struct LCM_DSI_PARAMS *dsi_params)
+{
+	unsigned int i = 0;
+>>>>>>> 4ccec69
 	unsigned int dsiTmpBufBpp;
 	unsigned int lanes = dsi_params->LANE_NUM;
 	unsigned int t_vfp, t_vbp, t_vsa;
@@ -1022,7 +1040,13 @@ void DSI_Config_VDO_Timing_with_DSC(enum DISP_MODULE_ENUM module,
 		t_hbp = 4;
 		ps_wc = dsi_params->horizontal_active_pixel * dsiTmpBufBpp / 8;
 		t_hbllp = 16 * dsi_params->LANE_NUM;
+<<<<<<< HEAD
 		ap_tx_total_word_cnt = (get_bdg_line_cycle() * lanes * RXTX_RATIO + 99) / 100;
+=======
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 start */
+		ap_tx_total_word_cnt = (get_bdg_line_cycle() * lanes * mtk_rxtx_ratio + 99) / 100;
+/* Huaqin modify for K19S-31 by jiangyue at 2022/01/14 end */
+>>>>>>> 4ccec69
 
 		switch (dsi_params->mode) {
 		case DSI_CMD_MODE:
@@ -1394,13 +1418,20 @@ enum DSI_STATUS DSI_PS_Control(enum DISP_MODULE_ENUM module,
 	int h)
 {
 	int i = 0;
+	int dsi_ps = 0;
 	unsigned int ps_sel_bitvalue = 0;
 	unsigned int ps_wc_adjust = 0;
 	unsigned int ps_wc = 0;
 
 	/* TODO: parameter checking */
+<<<<<<< HEAD
 	ASSERT((int)(dsi_params->PS) <= (int)PACKED_PS_18BIT_RGB666);
 	if ((int)(dsi_params->PS) > (int)(LOOSELY_PS_24BIT_RGB666))
+=======
+	dsi_ps = (int)(dsi_params->PS);
+	ASSERT(dsi_ps <= (int)PACKED_PS_18BIT_RGB666);
+	if (dsi_ps > (int)(LOOSELY_PS_24BIT_RGB666))
+>>>>>>> 4ccec69
 		ps_sel_bitvalue = (5 - dsi_params->PS);
 	else
 		ps_sel_bitvalue = dsi_params->PS;
@@ -1596,7 +1627,11 @@ static void _DSI_PHY_clk_setting(enum DISP_MODULE_ENUM module,
 {
 	int i = 0;
 	unsigned int j = 0;
+<<<<<<< HEAD
 	unsigned int data_Rate;
+=======
+	unsigned int data_Rate = 0;
+>>>>>>> 4ccec69
 	unsigned int pcw_ratio = 0;
 	unsigned int posdiv = 0;
 	unsigned int prediv = 0;
@@ -2243,6 +2278,10 @@ void DSI_PHY_TIMCONFIG(enum DISP_MODULE_ENUM module,
 		if (timcon2.CLK_TRAIL < 2)
 			timcon2.CLK_TRAIL = 2;
 /*K19A K19A-138 solve mipi timing  by feiwen at 2021/5/19 end*/
+<<<<<<< HEAD
+=======
+		timcon2.CONT_DET = 0;
+>>>>>>> 4ccec69
 
 		/* clk_exit > 100ns (spec) */
 		/* clk_exit = 200ns */
@@ -2503,10 +2542,12 @@ UINT32 DSI_dcs_read_lcm_reg_v2(enum DISP_MODULE_ENUM module,
 	struct DSI_RX_DATA_REG read_data3;
 	struct DSI_T0_INS t0;
 	struct DSI_T0_INS t1;
+#if 0 // comment the IRQ method to read register
 	static const long WAIT_TIMEOUT = 2 * HZ; /* 2 sec */
 	long ret;
-	unsigned int i;
 	struct t_condition_wq *waitq;
+#endif
+	unsigned int i;
 
 	/* illegal parameters */
 	ASSERT(cmdq == NULL);
@@ -2611,6 +2652,7 @@ UINT32 DSI_dcs_read_lcm_reg_v2(enum DISP_MODULE_ENUM module,
 		DSI_OUTREG32(cmdq, &DSI_REG[d]->DSI_START, 0);
 		DSI_OUTREG32(cmdq, &DSI_REG[d]->DSI_START, 1);
 
+#if 0
 		/*
 		 * the following code is to
 		 * 1: wait read ready
@@ -2635,6 +2677,13 @@ UINT32 DSI_dcs_read_lcm_reg_v2(enum DISP_MODULE_ENUM module,
 				DSI_REG[d]->DSI_INTEN, RD_RDY, 0);
 			return 0;
 		}
+#endif
+		/* Poll the read ready register to confirm successful read */
+		DISP_REG_CMDQ_POLLING_TIMEOUT(cmdq, &DSI_REG[d]->DSI_INTSTA, 0x00000001, 0x1, 500);
+		DSI_OUTREGBIT(cmdq,
+			      struct DSI_INT_STATUS_REG,
+			      DSI_REG[d]->DSI_INTSTA,
+			      RD_RDY, 0x00000000);
 
 		/* read data */
 		DSI_OUTREG32(cmdq, &read_data0,
@@ -2648,6 +2697,7 @@ UINT32 DSI_dcs_read_lcm_reg_v2(enum DISP_MODULE_ENUM module,
 
 		DSI_OUTREGBIT(cmdq, struct DSI_RACK_REG,
 			DSI_REG[d]->DSI_RACK, DSI_RACK, 1);
+#if 0
 		ret = wait_event_timeout(_dsi_context[d].cmddone_wq.wq,
 			!(DSI_REG[d]->DSI_INTSTA.BUSY), WAIT_TIMEOUT);
 		if (ret == 0) {
@@ -2656,7 +2706,8 @@ UINT32 DSI_dcs_read_lcm_reg_v2(enum DISP_MODULE_ENUM module,
 			DSI_DumpRegisters(module, 2);
 			DSI_Reset(module, NULL);
 		}
-
+#endif
+		DISP_REG_CMDQ_POLLING_TIMEOUT(cmdq, &DSI_REG[d]->DSI_INTSTA, 0x80000000, 0, 500);
 		DISPDBG("DSI read begin i = %d --------------------\n",
 			  5 - max_try_count);
 		DISPDBG("DSI_RX_STA     : 0x%08x\n",
@@ -4381,7 +4432,11 @@ void DSI_set_cmdq(enum DISP_MODULE_ENUM module, struct cmdqRecStruct *cmdq,
 int DSI_Send_ROI(enum DISP_MODULE_ENUM module, void *handle, unsigned int x,
 	unsigned int y, unsigned int width, unsigned int height)
 {
+<<<<<<< HEAD
 	if (!primary_display_is_video_mode())
+=======
+	if (!primary_display_is_video_mode() && (pgc != NULL))
+>>>>>>> 4ccec69
 		disp_lcm_update(pgc->plcm, x, y, width, height, 0);
 	else
 		DDPDBG("LCM is video mode, no need DSI send ROI!\n");
@@ -4522,7 +4577,11 @@ static void DSI_config_bdg_reg(struct cmdqRecStruct *cmdq,
 			unsigned char force_update)
 {
 	UINT32 i = 0;
+<<<<<<< HEAD
 	int dsi_i = 0;
+=======
+	unsigned int dsi_i = 0;
+>>>>>>> 4ccec69
 	unsigned long goto_addr, mask_para, set_para;
 	struct DSI_T0_INS t0;
 	struct DSI_T2_INS t2;
@@ -6469,6 +6528,7 @@ static const char *dsi_mode_spy(enum LCM_DSI_MODE_CON mode)
 
 void dsi_analysis(enum DISP_MODULE_ENUM module)
 {
+#if 0
 	int i = 0;
 
 	DDPDUMP("== DISP DSI ANALYSIS ==\n");
@@ -6514,6 +6574,7 @@ void dsi_analysis(enum DISP_MODULE_ENUM module)
 			i, DSI_REG[i]->DSI_LFR_CON.LFR_TYPE,
 			DSI_REG[i]->DSI_LFR_CON.LFR_SKIP_NUM);
 	}
+#endif
 }
 
 int ddp_dsi_dump(enum DISP_MODULE_ENUM module, int level)

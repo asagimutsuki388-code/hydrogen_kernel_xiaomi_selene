@@ -121,7 +121,11 @@ extern const uint16_t gesture_key_array[];
 extern char *BOOT_UPDATE_FIRMWARE_NAME;
 extern char *MP_UPDATE_FIRMWARE_NAME;
 /*BSP.TP - add tp compare - 20201116 - End*/
+<<<<<<< HEAD
 #define POINT_DATA_CHECKSUM 1
+=======
+#define POINT_DATA_CHECKSUM 0
+>>>>>>> 4ccec69
 #define POINT_DATA_CHECKSUM_LEN 65
 
 //---ESD Protect.---
@@ -138,11 +142,15 @@ struct nvt_ts_data {
 	uint16_t addr;
 	int8_t phys[32];
 #if defined(CONFIG_FB)
+<<<<<<< HEAD
 #ifdef _MSM_DRM_NOTIFY_H_
 	struct notifier_block drm_notif;
 #else
 	struct notifier_block fb_notif;
 #endif
+=======
+	struct notifier_block fb_notif;
+>>>>>>> 4ccec69
 #elif defined(CONFIG_HAS_EARLYSUSPEND)
 	struct early_suspend early_suspend;
 #endif
@@ -167,10 +175,13 @@ struct nvt_ts_data {
 	uint8_t *xbuf;
 	struct mutex xbuf_lock;
 	bool irq_enabled;
+<<<<<<< HEAD
 	#ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 	bool palm_sensor_changed;
 	bool palm_sensor_switch;
 	#endif
+=======
+>>>>>>> 4ccec69
 /*BSP.Tp - 2020.11.05 -add NVT_LOCKDOWN - start*/
 	char lockdowninfo[17];
 /*BSP.Tp - 2020.11.05 -add NVT_LOCKDOWN - end*/

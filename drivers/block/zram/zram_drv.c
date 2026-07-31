@@ -31,7 +31,6 @@
 #include <linux/vmalloc.h>
 #include <linux/err.h>
 #include <linux/idr.h>
-#include <linux/proc_fs.h>
 #include <linux/sysfs.h>
 #include <linux/debugfs.h>
 #include <linux/cpuhotplug.h>
@@ -45,7 +44,10 @@ static DEFINE_IDR(zram_index_idr);
 static DEFINE_MUTEX(zram_index_mutex);
 
 static int zram_major;
+<<<<<<< HEAD
 static struct zram *zram_devices;
+=======
+>>>>>>> 4ccec69
 static const char *default_compressor = CONFIG_ZRAM_DEFAULT_COMP_ALGORITHM;
 
 /* Module params (documentation at end) */
@@ -78,7 +80,7 @@ static void zram_slot_unlock(struct zram *zram, u32 index)
 
 static inline bool init_done(struct zram *zram)
 {
-	return zram ? zram->disksize : 0;
+	return zram->disksize;
 }
 
 static inline struct zram *dev_to_zram(struct device *dev)
@@ -323,7 +325,11 @@ static ssize_t idle_store(struct device *dev,
 {
 	struct zram *zram = dev_to_zram(dev);
 	unsigned long nr_pages = zram->disksize >> PAGE_SHIFT;
+<<<<<<< HEAD
 	int index, mark_nr = 0;
+=======
+	int index;
+>>>>>>> 4ccec69
 
 	if (!sysfs_streq(buf, "all"))
 		return -EINVAL;
@@ -403,7 +409,11 @@ static ssize_t idle_percent_show(struct device *dev,
 	return scnprintf(buf, PAGE_SIZE, "%u\n", idle_num * 100 / nr_pages);
 }
 
+<<<<<<< HEAD
 #if defined(CONFIG_ZRAM_WRITEBACK) || defined(CONFIG_RTMM)
+=======
+#ifdef CONFIG_ZRAM_WRITEBACK
+>>>>>>> 4ccec69
 static ssize_t writeback_limit_enable_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t len)
 {
@@ -758,12 +768,19 @@ static ssize_t writeback_store(struct device *dev,
 	struct page *page;
 	ssize_t ret = len;
 	int mode;
+<<<<<<< HEAD
 	unsigned long blk_idx = 0, wb_pages_nr = 0;
 
 	if (writeback_parse_input(buf, &wb_max, &wb_idle_min))
 		mode = IDLE_WRITEBACK;
 	else if (sysfs_streq(buf, "idle"))
 		mode = IDLE_WRITEBACK;
+=======
+	unsigned long blk_idx = 0;
+
+	if (sysfs_streq(buf, "idle"))
+		mode = IDLE_WRITEBACK;
+>>>>>>> 4ccec69
 	else if (sysfs_streq(buf, "huge"))
 		mode = HUGE_WRITEBACK;
 	else
@@ -2026,7 +2043,6 @@ static ssize_t disksize_store(struct device *dev,
 	}
 
 	zram->comp = comp;
-	barrier();
 	zram->disksize = disksize;
 	set_capacity(zram->disk, zram->disksize >> SECTOR_SHIFT);
 
@@ -2120,7 +2136,10 @@ static DEVICE_ATTR_WO(mem_limit);
 static DEVICE_ATTR_WO(mem_used_max);
 static DEVICE_ATTR_WO(idle);
 static DEVICE_ATTR_RO(idle_percent);
+<<<<<<< HEAD
 static DEVICE_ATTR_WO(new);
+=======
+>>>>>>> 4ccec69
 static DEVICE_ATTR_RW(max_comp_streams);
 static DEVICE_ATTR_RW(comp_algorithm);
 #if defined(CONFIG_ZRAM_WRITEBACK) || defined(CONFIG_RTMM)
@@ -2139,7 +2158,10 @@ static struct attribute *zram_disk_attrs[] = {
 	&dev_attr_mem_used_max.attr,
 	&dev_attr_idle.attr,
 	&dev_attr_idle_percent.attr,
+<<<<<<< HEAD
 	&dev_attr_new.attr,
+=======
+>>>>>>> 4ccec69
 	&dev_attr_max_comp_streams.attr,
 	&dev_attr_comp_algorithm.attr,
 #if defined(CONFIG_ZRAM_WRITEBACK) || defined(CONFIG_RTMM)
@@ -2257,10 +2279,6 @@ static int zram_add(void)
 	strlcpy(zram->compressor, default_compressor, sizeof(zram->compressor));
 
 	zram_debugfs_register(zram);
-
-	if (!zram_devices)
-		zram_devices = zram;
-
 	pr_info("Added device: %s\n", zram->disk->disk_name);
 	return device_id;
 
@@ -2303,8 +2321,6 @@ static int zram_remove(struct zram *zram)
 	del_gendisk(zram->disk);
 	blk_cleanup_queue(zram->disk->queue);
 	put_disk(zram->disk);
-	if (zram_devices == zram)
-		zram_devices = NULL;
 	kfree(zram);
 	return 0;
 }
@@ -2394,6 +2410,7 @@ static void destroy_devices(void)
 	cpuhp_remove_multi_state(CPUHP_ZCOMP_PREPARE);
 }
 
+<<<<<<< HEAD
 unsigned long zram_mlog(void)
 {
 #define P2K(x) (((unsigned long)x) << (PAGE_SHIFT - 10))
@@ -2468,6 +2485,8 @@ static const struct file_operations zraminfo_proc_fops = {
 };
 #endif
 
+=======
+>>>>>>> 4ccec69
 static int __init zram_init(void)
 {
 	int ret;
@@ -2503,10 +2522,6 @@ static int __init zram_init(void)
 			goto out_error;
 		num_devices--;
 	}
-
-#ifdef CONFIG_PROC_FS
-	proc_create("zraminfo", 0644, NULL, &zraminfo_proc_fops);
-#endif
 
 	return 0;
 

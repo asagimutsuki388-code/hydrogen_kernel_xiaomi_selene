@@ -2325,7 +2325,11 @@ static void unmap_page(struct page *page)
 	if (PageAnon(page))
 		ttu_flags |= TTU_SPLIT_FREEZE;
 
+<<<<<<< HEAD
 	try_to_unmap(page, ttu_flags);
+=======
+	try_to_unmap(page, ttu_flags, NULL);
+>>>>>>> 4ccec69
 
 	VM_WARN_ON_ONCE_PAGE(page_mapped(page), page);
 }

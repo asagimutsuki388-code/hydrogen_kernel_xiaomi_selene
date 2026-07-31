@@ -189,7 +189,7 @@ static inline int c2k_dbg_level(unsigned int level)
 #define C2K_LOG_INFO			6
 #define C2K_LOG_DBG				7
 
-#define C2K_USB_DBG_ON
+//#define C2K_USB_DBG_ON
 #ifdef C2K_USB_DBG_ON
 #define C2K_ERR(format, args...) do {if (c2k_dbg_level(C2K_LOG_ERR)) \
 	pr_notice("C2K_USB_ERR,<%s %d>, " format, __func__, __LINE__, \
@@ -212,11 +212,11 @@ while (0)
 	## args);  } \
 while (0)
 #else
-#define C2K_ERR(format, args...) do {} while (0)
-#define C2K_WARN(format, args...) do {} while (0)
-#define C2K_NOTE(format, args...) do {} while (0)
-#define C2K_INFO(format, args...) do {} while (0)
-#define C2K_DBG(format, args...) do {} while (0)
+#define C2K_ERR(format, args...) ((void)0)
+#define C2K_WARN(format, args...) ((void)0)
+#define C2K_NOTE(format, args...) ((void)0)
+#define C2K_INFO(format, args...) ((void)0)
+#define C2K_DBG(format, args...) ((void)0)
 #endif
 
 extern unsigned int upstream_data[_MAX_TID];
