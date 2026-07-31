@@ -2,7 +2,7 @@
 VERSION = 4
 PATCHLEVEL = 14
 SUBLEVEL = 357
-EXTRAVERSION = 
+EXTRAVERSION =
 NAME = Petit Gorille
 
 # *DOCUMENTATION*
@@ -372,19 +372,11 @@ ifneq ($(LLVM),)
 HOSTCC	= clang
 HOSTCXX	= clang++
 else
-<<<<<<< HEAD
-HOSTCC       = gcc
-HOSTCXX      = g++
-endif
-HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 \
-		-fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
-=======
 HOSTCC	= gcc
 HOSTCXX	= g++
 endif
 HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 \
 		-fomit-frame-pointer -std=gnu89 -pipe $(HOST_LFS_CFLAGS)
->>>>>>> 4ccec69
 HOSTCXXFLAGS := -O2 $(HOST_LFS_CFLAGS)
 HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS)
 HOST_LOADLIBES := $(HOST_LFS_LIBS)
@@ -399,30 +391,17 @@ NM		= llvm-nm
 OBJCOPY		= llvm-objcopy
 OBJDUMP		= llvm-objdump
 READELF		= llvm-readelf
-<<<<<<< HEAD
-OBJSIZE		= llvm-size
-=======
->>>>>>> 4ccec69
 STRIP		= llvm-strip
 HOSTLDFLAGS	+= -fuse-ld=lld
 else
 CC		= $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld
-<<<<<<< HEAD
-LDGOLD	= $(CROSS_COMPILE)ld.gold
-=======
 LDGOLD		= $(CROSS_COMPILE)ld.gold
->>>>>>> 4ccec69
 AR		= $(CROSS_COMPILE)ar
-AS		= $(CROSS_COMPILE)as
 NM		= $(CROSS_COMPILE)nm
 OBJCOPY		= $(CROSS_COMPILE)objcopy
 OBJDUMP		= $(CROSS_COMPILE)objdump
 READELF		= $(CROSS_COMPILE)readelf
-<<<<<<< HEAD
-OBJSIZE		= $(CROSS_COMPILE)size
-=======
->>>>>>> 4ccec69
 STRIP		= $(CROSS_COMPILE)strip
 endif
 AWK		= awk
@@ -438,7 +417,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 NOSTDINC_FLAGS  =
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
-LDFLAGS_MODULE  = --strip-debug
+LDFLAGS_MODULE  =
 CFLAGS_KERNEL	=
 AFLAGS_KERNEL	=
 LDFLAGS_vmlinux =
@@ -560,19 +539,7 @@ CLANG_FLAGS	+= -no-integrated-as
 GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
 CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
 endif
-<<<<<<< HEAD
-ifneq ($(GCC_TOOLCHAIN),)
-CLANG_FLAGS	+= --gcc-toolchain=$(GCC_TOOLCHAIN)
-endif
-ifneq ($(LLVM_IAS),1)
-CLANG_FLAGS	+= -no-integrated-as
-endif
-CLANG_FLAGS	+= $(call cc-option, -Wno-unknown-warning-option)
-CLANG_FLAGS	+= $(call cc-option, -Wno-misleading-indentation)
-CLANG_FLAGS	+= $(call cc-option, -Wno-bool-operation)
-=======
 CLANG_FLAGS	+= -Werror=unknown-warning-option
->>>>>>> 4ccec69
 KBUILD_CFLAGS	+= $(CLANG_FLAGS)
 KBUILD_AFLAGS	+= $(CLANG_FLAGS)
 export CLANG_FLAGS
@@ -740,10 +707,6 @@ endif
 LLVM_AR		:= llvm-ar
 LLVM_NM		:= llvm-nm
 export LLVM_AR LLVM_NM
-
-# Set O3 optimization level for LTO
-LDFLAGS		+= --plugin-opt=O3
-
 endif
 
 # The arch Makefile can set ARCH_{CPP,A,C}FLAGS to override the default
@@ -766,73 +729,9 @@ KBUILD_CFLAGS	+= $(call cc-disable-warning, array-compare)
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS   += -Os
-<<<<<<< HEAD
-KBUILD_AFLAGS   += -Os
-KBUILD_LDFLAGS  += -Os
-else ifeq ($(cc-name),clang)
-KBUILD_CFLAGS   += -O3
-KBUILD_AFLAGS   += -O3
-ifdef CONFIG_POLLY_CLANG
-POLLY_FLAGS	+= -mllvm -polly \
-		   -mllvm -polly-ast-use-context \
-		   -mllvm -polly-invariant-load-hoisting \
-		   -mllvm -polly-loopfusion-greedy=1 \
-		   -mllvm -polly-postopts=1 \
-		   -mllvm -polly-reschedule=1 \
-		   -mllvm -polly-run-inliner \
-		   -mllvm -polly-vectorizer=stripmine
-# Polly may optimise loops with dead paths beyound what the linker
-# can understand. This may negate the effect of the linker's DCE
-# so we tell Polly to perfom proven DCE on the loops it optimises
-# in order to preserve the overall effect of the linker's DCE.
-ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
-POLLY_FLAGS	+= -mllvm -polly-run-dce
-=======
 else
 KBUILD_CFLAGS   += -O3
->>>>>>> 4ccec69
 endif
-OPT_FLAGS	+= $(POLLY_FLAGS)
-KBUILD_LDFLAGS	+= $(POLLY_FLAGS)
-endif
-
-ifdef CONFIG_LTO_CLANG
-KBUILD_CFLAG	+= -fwhole-program-vtables
-endif
-
-ifeq ($(cc-name),clang)
-ifdef CONFIG_INLINE_OPTIMIZATION
-KBUILD_CFLAGS	+= -mllvm -inline-threshold=2000
-KBUILD_CFLAGS	+= -mllvm -inlinehint-threshold=3000
-KBUILD_CFLAGS   += -mllvm -unroll-threshold=1200
-KBUILD_LDFLAGS  += --plugin-opt=-import-instr-limit=40
-endif
-endif
-else
-KBUILD_CFLAGS   += -O3 -ffp-contract=fast
-endif
-
-# Tell compiler to tune the performance of the code for a specified
-# target processor
-ifeq ($(cc-name),gcc)
-KBUILD_CFLAGS += -mcpu=cortex-a75.cortex-a55
-KBUILD_AFLAGS += -mcpu=cortex-a75.cortex-a55
-else ifeq ($(cc-name),clang)
-KBUILD_CFLAGS += -O3
-KBUILD_CFLAGS += -mcpu=cortex-a75
-KBUILD_AFLAGS += -mcpu=cortex-a75
-endif
-
-KBUILD_CFLAGS += $(call cc-ifversion, -gt, 0900, \
-			$(call cc-option, -Wno-psabi) \
-			$(call cc-disable-warning,maybe-uninitialized,) \
-			$(call cc-disable-warning,format,) \
-			$(call cc-disable-warning,array-bounds,) \
-			$(call cc-disable-warning,stringop-overflow,))
-
-KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
-			$(call cc-disable-warning,maybe-uninitialized,))
-
 
 # Tell compiler to tune the performance of the code for a specified
 # target processor
@@ -921,10 +820,6 @@ ifeq ($(cc-name),clang)
 KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
 KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
 KBUILD_CFLAGS += $(call cc-disable-warning, duplicate-decl-specifier)
-KBUILD_CFLAGS += $(call cc-option, -Wno-undefined-optimized)
-KBUILD_CFLAGS += $(call cc-option, -Wno-tautological-constant-out-of-range-compare)
-KBUILD_CFLAGS += $(call cc-option, -mllvm -disable-struct-const-merge)
-KBUILD_CFLAGS += $(call cc-option, -Wno-sometimes-uninitialized)
 # Quiet clang warning: comparison of unsigned expression < 0 is always false
 KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
 # CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
@@ -1052,15 +947,6 @@ KBUILD_LDFLAGS_MODULE += $(LD_FLAGS_LTO_CLANG)
 
 KBUILD_LDFLAGS_MODULE += -T scripts/module-lto.lds
 
-<<<<<<< HEAD
-# Limit inlining across translation units to reduce binary size
-LD_FLAGS_LTO_CLANG := -mllvm -import-instr-limit=5
-
-KBUILD_LDFLAGS += $(LD_FLAGS_LTO_CLANG)
-KBUILD_LDFLAGS_MODULE += $(LD_FLAGS_LTO_CLANG)
-
-=======
->>>>>>> 4ccec69
 KBUILD_LDS_MODULE += $(srctree)/scripts/module-lto.lds
 
 # allow disabling only clang LTO where needed
@@ -1182,41 +1068,6 @@ include scripts/Makefile.ubsan
 KBUILD_CPPFLAGS += $(ARCH_CPPFLAGS) $(KCPPFLAGS)
 KBUILD_AFLAGS   += $(ARCH_AFLAGS)   $(KAFLAGS)
 KBUILD_CFLAGS   += $(ARCH_CFLAGS)   $(KCFLAGS)
-
-# =============FACTORY==================================
-# Add macros only for factory version
-ifeq ($(strip $(FACTORY_VERSION_MODE)) , true)
-KBUILD_CFLAGS += -DFACTORY_VERSION_ENABLE
-endif
-# =============FACTORY==================================
-
-# Huaqin add for HQ-131657 by liunianliang at 2021/06/03 start
-ifeq ($(strip $(ENABLE_MIUI_DEBUGGING)), true)
-KBUILD_CFLAGS += -DENABLE_MIUI_DEBUGGING
-endif
-# Huaqin add for HQ-131657 by liunianliang at 2021/06/03 end
-
-# =============PROJECT==================================
-# Add macros by TARGET_PRODUCT for different projects
-ifeq ($(strip $(TARGET_PRODUCT)) , lancelot)
-# Define macros here only for lancelot project
-KBUILD_CFLAGS += -DTARGET_PRODUCT_LANCELOT
-else ifeq ($(strip $(TARGET_PRODUCT)) , shiva)
-# Define macros here only for shiva project
-KBUILD_CFLAGS += -DTARGET_PRODUCT_SHIVA
-else
-endif
-
-ifeq ($(strip $(TARGET_PRODUCT)) , selene)
-# Define macros here only for selene project
-KBUILD_CFLAGS += -DTARGET_PRODUCT_SELENE
-endif
-
-ifneq (,$(filter merlin merlinin merlinnfc, $(TARGET_PRODUCT)))
-# Define macros here only for merlin common project
-KBUILD_CFLAGS += -DTARGET_PRODUCT_MERLINCOMMON
-endif
-# =============PROJECT==================================
 
 # Use --build-id when available.
 LDFLAGS_BUILD_ID := --build-id
@@ -2008,7 +1859,6 @@ clean: $(clean-dirs)
 		-o -name '*.dwo'  \
 		-o -name '*.su'  \
 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
-		-o -name '*.lex.c' -o -name '*.tab.[ch]' \
 		-o -name '*.symtypes' -o -name 'modules.order' \
 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
 		-o -name '*.c.[012]*.*' \
